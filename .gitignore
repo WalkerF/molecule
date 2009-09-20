@@ -1,0 +1,7 @@
+
+*.fla
+*.swf
+*.swc
+*.cache
+*.swp
+.DS_STORE
