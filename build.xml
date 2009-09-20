@@ -1,0 +1,45 @@
+<?xml version="1.0" ?>
+
+<project name="Molecule" default="build">
+
+    <taskdef resource="flexTasks.tasks" />
+
+    <property name="main.file" value="Molecule.as" />
+    <property name="src.dir" value="src" />
+    <property name="lib.dir" value="lib" />
+    <property name="res.dir" value="res" />
+
+    <!-- Default task; builds the project file. -->
+    <target name="build">
+        <mxmlc file="${main.file}" as3="true" incremental="true" debug="true" allow-source-path-overlap="true">
+            <default-size width="550" height="400" />
+            <metadata description="Proving Grounds for Radical Ideas">
+                <creator name="Alex Schearer" />
+            </metadata>
+            <compiler.source-path path-element="${src.dir}" />
+            <compiler.source-path path-element="${lib.dir}" />
+            <compiler.library-path dir="${res.dir}">
+                <include name="**/*.swc" />
+            </compiler.library-path>
+        </mxmlc>
+    </target>
+
+    <!-- Clears the directory of all junk. -->
+    <target name="clear">
+        <delete>
+            <fileset dir="." defaultExcludes="no">
+                <include name="**/*.DS_Store"/>
+                <include name="**/*.cache" />
+            </fileset>
+        </delete>
+    </target>
+    
+    <!-- Clean build: clears the workspace then builds. -->
+    <target name="clean" depends="clear,build" />
+
+    <target name="help">
+        <echo message="Build Help" />
+        <echo message="To build the project just type `build`" />
+        <echo message="To build the project from scratch type `build clean`" />
+    </target>
+</project>

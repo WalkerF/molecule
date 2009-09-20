@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# Sets up the current environment so that it is ready to work with Flex and on
+# the current project. Should be run once before your try to run other scripts
+# associted with the project. To run call:
+#     . ./bin/init
+#
+# Alex Schearer <aschearer@gmail.com>
+
+FLEX_HOME=~/Source/flex_sdk_3.4
+FLEX_BIN=$FLEX_HOME/bin
+
+PROJECT_BIN=~/Source/mole/bin
+PROJECT_EXE=Molecule.swf
+PROJECT_DEBUGGER="/Applications/Adobe Flash CS4/Players/Debug/Flash Player.app"
+
+export PATH=$PATH:$FLEX_BIN:$PROJECT_BIN
+export FLEX_HOME=$FLEX_HOME
+export PROJECT_EXE=$PROJECT_EXE
+export PROJECT_DEBUGGER=$PROJECT_DEBUGGER

@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# Convenience wrapper to launch the current project. By default it launches the
+# project executable defined in the `init` script. 
+#
+# Alex Schearer <aschearer@gmail.com>
+
+open -a "$PROJECT_DEBUGGER" $PROJECT_EXE
