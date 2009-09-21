@@ -4,5 +4,5 @@
 *.swc
 *.cache
 *.swp
-.DS_STORE
+.DS_Store
 lib/*
