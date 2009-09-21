@@ -6,10 +6,10 @@ package com.aem.molecule
     import Box2D.Collision.Shapes.*;
     import Box2D.Common.Math.*;
 
-    public class Box extends Entity 
+    public class RectangularBody extends Entity 
     {
 
-        public function Box():void
+        public function RectangularBody():void
         {
             _density = 2;
             _friction = .4;
