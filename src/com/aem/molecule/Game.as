@@ -214,9 +214,9 @@ package com.aem.molecule
         {
             keysDown[e.keyCode] = false;
 
-            if (e.keyCode == Keyboard.SPACE)
+            if (e.keyCode == Keyboard.SPACE && _subject.GetLinearVelocity().y < 0)
             {
-                _subject.ApplyImpulse(new b2Vec2(0, _jump_speed / 2), _subject.GetWorldCenter());
+                _subject.ApplyImpulse(new b2Vec2(0, _jump_speed / 4), _subject.GetWorldCenter());
             }
 
             if (!keysDown[Keyboard.LEFT] && !keysDown[Keyboard.RIGHT])
