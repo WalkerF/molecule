@@ -4,8 +4,6 @@ package com.aem.molecule
     import flash.display.Sprite;
     import flash.display.DisplayObject;
     import flash.events.Event;
-    import flash.events.KeyboardEvent;
-    import flash.ui.Keyboard;
 
     import fl.controls.Slider;
     import fl.events.SliderEvent;
@@ -28,12 +26,9 @@ package com.aem.molecule
         private var _camera:Camera;
 
         private var _world:b2World;
-        private var _listener:GroundedContactListener;
         private var _subject:b2Body;
         private var _gravity:b2Vec2 = new b2Vec2(0, STARTING_GRAVITY);
         private var _starting_body_size:Number; // in pixels
-        private var _movement_speed:Number = STARTING_SPEED;
-        private var _jump_speed:Number = STARTING_JUMP;
 
         public function Level(sprite:Sprites, sliders:Sliders):void
         {
@@ -56,15 +51,10 @@ package com.aem.molecule
         private function setup(e:Event):void
         {
             addEventListener(Event.ENTER_FRAME, update);
-            stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyPress);
-            stage.addEventListener(KeyboardEvent.KEY_UP, onKeyRelease);
 
             initWorld();
             initBodies();
             //initDebug();
-
-            _listener = new GroundedContactListener("ground_sensor");
-            _world.SetContactListener(_listener);
 
             setupSliders();
         }
@@ -72,8 +62,6 @@ package com.aem.molecule
         private function teardown(e:Event):void
         {
             removeEventListener(Event.ENTER_FRAME, update);
-            stage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyPress);
-            stage.removeEventListener(KeyboardEvent.KEY_UP, onKeyRelease);
 
             destroyBodies();
             destroyWorld();
@@ -106,12 +94,12 @@ package com.aem.molecule
 
         private function changeSpeed(e:SliderEvent):void
         {
-            _movement_speed = STARTING_SPEED * (e.value / 6);
+            _subject.GetUserData().movement_speed = STARTING_SPEED * (e.value / 6);
         }
 
         private function changeJump(e:SliderEvent):void
         {
-            _jump_speed = STARTING_JUMP * (e.value / 6);
+            _subject.GetUserData().jump_speed = STARTING_JUMP * (e.value / 6);
         }
 
         private function changeGravity(e:SliderEvent):void
@@ -172,6 +160,8 @@ package com.aem.molecule
             _starting_body_size = body.width;
 
             _subject = createBody(body.width);
+            body.movement_speed = STARTING_SPEED;
+            body.jump_speed = STARTING_JUMP;
         }
 
         private function update(e:Event):void
@@ -186,57 +176,13 @@ package com.aem.molecule
                     body.m_userData.y = m2p(body.GetPosition().y);
                     body.m_userData.rotation = body.GetAngle() * (180 / Math.PI);
                 }
+                if (body.m_userData is Body)
+                {
+                    Body(body.m_userData).update();
+                }
             }
-
-            if (moving)
-            {
-                var velocity:b2Vec2 = new b2Vec2();
-                if (keysDown[Keyboard.LEFT])
-                    velocity.Set(-_movement_speed, _subject.GetLinearVelocity().y);
-                if (keysDown[Keyboard.RIGHT])
-                    velocity.Set(_movement_speed, _subject.GetLinearVelocity().y);
-
-                _subject.WakeUp();
-                _subject.SetLinearVelocity(velocity);
-            }
-            _subject.m_sweep.a = 0;
 
             _camera.update();
-        }
-
-        private var moving:Boolean;
-        private var keysDown:Array = [];
-
-        private function onKeyPress(e:KeyboardEvent):void
-        {
-            keysDown[e.keyCode] = true;
-
-            if (e.keyCode == Keyboard.LEFT || e.keyCode == Keyboard.RIGHT)
-                moving = true;
-
-            if (e.keyCode == Keyboard.SPACE && _listener.grounded)
-            {
-                _listener.grounded = false;
-                _subject.WakeUp();
-                _subject.ApplyImpulse(new b2Vec2(0, -_jump_speed), _subject.GetWorldCenter());
-            }
-        }
-
-        private function onKeyRelease(e:KeyboardEvent):void
-        {
-            keysDown[e.keyCode] = false;
-
-            if (e.keyCode == Keyboard.SPACE && _subject.GetLinearVelocity().y < 0)
-            {
-                _subject.ApplyImpulse(new b2Vec2(0, _jump_speed / 4), _subject.GetWorldCenter());
-            }
-
-            if (!keysDown[Keyboard.LEFT] && !keysDown[Keyboard.RIGHT])
-            {
-                moving = false;
-                _subject.SetLinearVelocity(new b2Vec2(0, _subject.GetLinearVelocity().y));
-            }
-
         }
 
         private function destroyBodies():void
