@@ -60,9 +60,7 @@ package com.aem.molecule
             _sprite.stage.addEventListener(KeyboardEvent.KEY_UP, onKeyRelease);
 
             initWorld();
-            initGround();
-            initBody();
-            initCrates();
+            initBodies();
             //initDebug();
 
             _listener = new GroundedContactListener("ground_sensor");
@@ -89,9 +87,9 @@ package com.aem.molecule
         private function changeSize(e:SliderEvent):void
         {
             _world.DestroyBody(_subject);
-            _subject = createBody(_starting_body_size * (e.value / 6));
             _subject.GetUserData().width = _starting_body_size * (e.value / 6);
             _subject.GetUserData().height = _starting_body_size * (e.value / 6);
+            _subject = createBody(_starting_body_size * (e.value / 6));
         }
 
         private function changeSpeed(e:SliderEvent):void
@@ -112,28 +110,7 @@ package com.aem.molecule
 
         private function createBody(pixels:Number):b2Body
         {
-            var bodyDef:b2BodyDef = new b2BodyDef();
-            bodyDef.position.Set(p2m(_sprite._body.x), p2m(_sprite._body.y) );
-            bodyDef.userData = _sprite._body;
-
-            var boxDef:b2PolygonDef = new b2PolygonDef();
-            boxDef.SetAsBox(p2m(pixels / 2), p2m(pixels / 2));
-            boxDef.friction = .3;
-            boxDef.density = 1;
-            boxDef.restitution = 0;
-
-            var body:b2Body = _world.CreateBody(bodyDef);
-            body.CreateShape(boxDef);
-
-            var ground_sensor:b2PolygonDef = new b2PolygonDef();
-            ground_sensor.isSensor = true;
-            ground_sensor.userData = "ground_sensor";
-            ground_sensor.SetAsOrientedBox(p2m(pixels / 2), p2m(pixels / 16), new b2Vec2(0, p2m(pixels / 1.8)), 0);
-            body.CreateShape(ground_sensor);
-
-            body.SetMassFromShapes();
-
-            return body;
+            return _sprite._body.init(_world);
         }
 
         private function initDebug():void
@@ -161,63 +138,28 @@ package com.aem.molecule
             _world = new b2World(worldAABB, _gravity, true);
         }
 
-        private function p2m(pixels:Number):Number
-        {
-            return pixels / 30;
-        }
-
         private function m2p(meters:Number):Number
         {
             return meters * 30;
         }
 
-        private function initGround():void
+        private function initBodies():void
         {
-            var bodyDef:b2BodyDef = new b2BodyDef();
-            bodyDef.position.Set(p2m(_sprite._ground.x), p2m(_sprite._ground.y) );
-            bodyDef.userData = _sprite._ground;
-
-            var boxDef:b2PolygonDef = new b2PolygonDef();
-            boxDef.SetAsBox(p2m(_sprite._ground.width / 2), p2m(_sprite._ground.height / 2));
-            boxDef.friction = .4;
-            boxDef.density = 0;
-
-            var body:b2Body = _world.CreateBody(bodyDef);
-            body.CreateShape(boxDef);
-            body.SetMassFromShapes();
-        }
-
-        private function initBody():void
-        {
-            _starting_body_size = _sprite._body.width;
-
-            _subject = createBody(_sprite._body.width);
-        }
-
-        private function initCrates():void
-        {
-            for (var i:uint = 0; i < _sprite.numChildren; i++) {
-                if (_sprite.getChildAt(i).name != "_body" &&
-                        _sprite.getChildAt(i).name != "_ground")
-                    initCrate(_sprite.getChildAt(i));
+            for (var i:uint = 0; i < _sprite.numChildren; i++) 
+            {
+                var child:DisplayObject = _sprite.getChildAt(i);
+                if (child is Body)
+                    initBody(Body(child));
+                else if (child is Entity)
+                    Entity(child).init(_world);
             }
         }
 
-        private function initCrate(crate:DisplayObject):void
+        private function initBody(body:Body):void
         {
-            var bodyDef:b2BodyDef = new b2BodyDef();
-            bodyDef.position.Set(p2m(crate.x), p2m(crate.y) );
-            bodyDef.userData = crate;
+            _starting_body_size = body.width;
 
-            var boxDef:b2PolygonDef = new b2PolygonDef();
-            boxDef.SetAsBox(p2m(crate.width / 2), p2m(crate.height / 2));
-            boxDef.friction = .3;
-            boxDef.density = 2;
-            boxDef.restitution = 0;
-
-            var body:b2Body = _world.CreateBody(bodyDef);
-            body.CreateShape(boxDef);
-            body.SetMassFromShapes();
+            _subject = createBody(body.width);
         }
 
         private function update(e:Event):void
