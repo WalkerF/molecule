@@ -3,9 +3,9 @@ package com.aem.molecule
     import Box2D.Dynamics.*;
     import Box2D.Collision.*;
 
-    import flash.display.Sprite;
+    import flash.display.MovieClip;
 
-    public class Entity extends Sprite
+    public class Entity extends MovieClip 
     {
 
         protected var _density:Number;

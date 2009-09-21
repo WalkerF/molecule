@@ -27,6 +27,8 @@ package com.aem.molecule
             _friction = .4;
             _restitution = 0;
 
+            gotoAndStop("idle");
+
             addEventListener(Event.ADDED_TO_STAGE, setup);
             addEventListener(Event.REMOVED_FROM_STAGE, teardown);
         }
@@ -67,6 +69,21 @@ package com.aem.molecule
                 _body.SetLinearVelocity(velocity);
             }
             _body.m_sweep.a = 0;
+
+            if (_listener.grounded)
+            {
+                gotoAndStop("idle");
+                if (_moving)
+                {
+                    gotoAndStop("running");
+                    if (_keysDown[Keyboard.LEFT])
+                        scaleX = 1;
+                    else
+                        scaleX = -1;
+                } else if (_keysDown[Keyboard.DOWN]) {
+                    gotoAndStop("crouching");
+                }
+            }
         }
 
         private function onKeyPress(e:KeyboardEvent):void
@@ -78,6 +95,7 @@ package com.aem.molecule
 
             if (e.keyCode == Keyboard.SPACE && _listener.grounded)
             {
+                gotoAndStop("jumping");
                 _listener.grounded = false;
                 _body.ApplyImpulse(new b2Vec2(0, -_jump_speed), _body.GetWorldCenter());
             }
