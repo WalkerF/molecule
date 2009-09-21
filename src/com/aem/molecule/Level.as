@@ -26,6 +26,7 @@ package com.aem.molecule
         private var _camera:Camera;
 
         private var _world:b2World;
+        private var _listener:BoundarySweeper;
         private var _subject:b2Body;
         private var _gravity:b2Vec2 = new b2Vec2(0, STARTING_GRAVITY);
         private var _starting_body_size:Number; // in pixels
@@ -87,7 +88,8 @@ package com.aem.molecule
         private function changeSize(e:SliderEvent):void
         {
             _world.DestroyBody(_subject);
-            _subject.GetUserData().width = _starting_body_size * (e.value / 6);
+            trace(e.value / 6);
+            _subject.GetUserData().width  = _starting_body_size * (e.value / 6);
             _subject.GetUserData().height = _starting_body_size * (e.value / 6);
             _subject = createBody(_starting_body_size * (e.value / 6));
         }
@@ -136,6 +138,9 @@ package com.aem.molecule
             worldAABB.upperBound.Set(300, 200);
 
             _world = new b2World(worldAABB, _gravity, true);
+
+            _listener = new BoundarySweeper();
+            _world.SetBoundaryListener(_listener);
         }
 
         private function m2p(meters:Number):Number
@@ -183,6 +188,14 @@ package com.aem.molecule
             }
 
             _camera.update();
+
+            for each (var outOfBoundsBody:b2Body in _listener.bodies)
+            {
+                _sprite.removeChild(outOfBoundsBody.GetUserData());
+                outOfBoundsBody.SetUserData(null);
+                _world.DestroyBody(outOfBoundsBody);
+            }
+            _listener.clear();
         }
 
         private function destroyBodies():void
@@ -196,7 +209,8 @@ package com.aem.molecule
 
         private function destroyWorld():void
         {
-            _world.SetContactListener(null);
+            _world.SetContactListener(null); // TODO move this to Body
+            _world.SetBoundaryListener(null);
             _world = null;
         }
 

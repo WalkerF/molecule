@@ -25,7 +25,7 @@ package com.aem.molecule
         {
             _grounded = value;
             if (!value)
-                _counter = 4;
+                _counter = 8;
         }
 
         public override function Persist(point:b2ContactPoint):void

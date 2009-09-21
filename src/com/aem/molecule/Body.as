@@ -70,18 +70,21 @@ package com.aem.molecule
             }
             _body.m_sweep.a = 0;
 
+            if (_keysDown[Keyboard.LEFT] && scaleX < 0)
+                scaleX *= -1;
+            if (_keysDown[Keyboard.RIGHT] && scaleX > 0)
+                scaleX *= -1;
+
             if (_listener.grounded)
             {
                 gotoAndStop("idle");
                 if (_moving)
                 {
                     gotoAndStop("running");
-                    if (_keysDown[Keyboard.LEFT])
-                        scaleX = 1;
-                    else
-                        scaleX = -1;
                 } else if (_keysDown[Keyboard.DOWN]) {
                     gotoAndStop("crouching");
+                } else if (_keysDown[Keyboard.UP]) {
+                    gotoAndStop("peeking");
                 }
             }
         }
