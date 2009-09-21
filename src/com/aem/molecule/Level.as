@@ -1,7 +1,6 @@
 
 package com.aem.molecule
 {
-
     import flash.display.Sprite;
     import flash.display.DisplayObject;
     import flash.events.Event;
@@ -45,7 +44,8 @@ package com.aem.molecule
             _camera.addChild(_sprite);
             _camera.follow(_sprite._body);
 
-            _sprite.addEventListener(Event.ADDED_TO_STAGE, setup);
+            addEventListener(Event.ADDED_TO_STAGE, setup);
+            addEventListener(Event.REMOVED_FROM_STAGE, teardown);
 
             _sliders = sliders;
             _sliders.x = 10;
@@ -55,9 +55,9 @@ package com.aem.molecule
 
         private function setup(e:Event):void
         {
-            _sprite.addEventListener(Event.ENTER_FRAME, update);
-            _sprite.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyPress);
-            _sprite.stage.addEventListener(KeyboardEvent.KEY_UP, onKeyRelease);
+            addEventListener(Event.ENTER_FRAME, update);
+            stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyPress);
+            stage.addEventListener(KeyboardEvent.KEY_UP, onKeyRelease);
 
             initWorld();
             initBodies();
@@ -67,6 +67,18 @@ package com.aem.molecule
             _world.SetContactListener(_listener);
 
             setupSliders();
+        }
+
+        private function teardown(e:Event):void
+        {
+            removeEventListener(Event.ENTER_FRAME, update);
+            stage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyPress);
+            stage.removeEventListener(KeyboardEvent.KEY_UP, onKeyRelease);
+
+            destroyBodies();
+            destroyWorld();
+
+            destroySliders();
         }
 
         private function setupSliders():void
@@ -225,6 +237,29 @@ package com.aem.molecule
                 _subject.SetLinearVelocity(new b2Vec2(0, _subject.GetLinearVelocity().y));
             }
 
+        }
+
+        private function destroyBodies():void
+        {
+            for (var body:b2Body = _world.m_bodyList; body; body = body.m_next)
+            {
+                body.m_userData = null;
+                _world.DestroyBody(body);
+            }
+        }
+
+        private function destroyWorld():void
+        {
+            _world.SetContactListener(null);
+            _world = null;
+        }
+
+        private function destroySliders():void
+        {
+            _sliders._sizeSlider.removeEventListener(SliderEvent.CHANGE, changeSize);
+            _sliders._speedSlider.removeEventListener(SliderEvent.CHANGE, changeSpeed);
+            _sliders._jumpSlider.removeEventListener(SliderEvent.CHANGE, changeJump);
+            _sliders._gravitySlider.removeEventListener(SliderEvent.CHANGE, changeGravity);
         }
     }
 }
