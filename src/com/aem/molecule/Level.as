@@ -16,7 +16,7 @@ package com.aem.molecule
     import Box2D.Collision.Shapes.*;
     import Box2D.Common.Math.*;
 
-    public class Game extends Sprite
+    public class Level extends Sprite
     {
         private static const ITERATIONS:uint = 10;
         private static const TIMESTEP:Number = 1 / 30;
@@ -36,7 +36,7 @@ package com.aem.molecule
         private var _movement_speed:Number = STARTING_SPEED;
         private var _jump_speed:Number = STARTING_JUMP;
 
-        public function Game(sprite:Sprites, sliders:Sliders):void
+        public function Level(sprite:Sprites, sliders:Sliders):void
         {
             _camera = new Camera();
             addChild(_camera);
