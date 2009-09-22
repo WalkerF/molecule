@@ -2,8 +2,10 @@
 
 # Sets up the current environment so that it is ready to work with Flex and on
 # the current project. Should be run once before your try to run other scripts
-# associted with the project. To run call:
+# associated with the project. To run call:
 #     . ./bin/init
+#
+# Change this file to reflect your environment and you shold be good to go.
 #
 # Alex Schearer <aschearer@gmail.com>
 

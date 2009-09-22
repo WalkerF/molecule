@@ -7,7 +7,6 @@
 #
 # Alex Schearer <aschearer@gmail.com>
 
-#FLEX_HOME=~/Source/flex_sdk_3.4
 FLEX_TASKS=$FLEX_HOME/ant/lib/flexTasks.jar
 
 ant -q -lib $FLEX_TASKS -DFLEX_HOME=$FLEX_HOME $1
