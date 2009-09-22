@@ -175,15 +175,15 @@ package com.aem.molecule
 
             for (var body:b2Body = _world.m_bodyList; body; body = body.m_next)
             {
-                if (body.m_userData is Sprite)
+                if (body.GetUserData() is Sprite)
                 {
-                    body.m_userData.x = m2p(body.GetPosition().x);
-                    body.m_userData.y = m2p(body.GetPosition().y);
-                    body.m_userData.rotation = body.GetAngle() * (180 / Math.PI);
+                    body.GetUserData().x = m2p(body.GetPosition().x);
+                    body.GetUserData().y = m2p(body.GetPosition().y);
+                    body.GetUserData().rotation = body.GetAngle() * (180 / Math.PI);
                 }
-                if (body.m_userData is ActiveEntity)
+                if (body.GetUserData() is ActiveEntity)
                 {
-                    ActiveEntity(body.m_userData).update();
+                    ActiveEntity(body.GetUserData()).update();
                 }
             }
 
@@ -202,7 +202,7 @@ package com.aem.molecule
         {
             for (var body:b2Body = _world.m_bodyList; body; body = body.m_next)
             {
-                body.m_userData = null;
+                body.SetUserData(null);
                 _world.DestroyBody(body);
             }
         }
