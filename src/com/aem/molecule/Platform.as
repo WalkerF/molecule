@@ -6,7 +6,7 @@ package com.aem.molecule
     import Box2D.Collision.Shapes.*;
     import Box2D.Common.Math.*;
 
-    public class Platform extends Entity 
+    public class Platform extends PhysicalEntity 
     {
 
         public function Platform():void
@@ -33,5 +33,6 @@ package com.aem.molecule
 
             return body;
         }
+
     }
 }

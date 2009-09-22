@@ -5,7 +5,7 @@ package com.aem.molecule
 
     import flash.display.MovieClip;
 
-    public class Entity extends MovieClip 
+    public class PhysicalEntity extends MovieClip 
     {
 
         protected var _density:Number;
@@ -27,14 +27,18 @@ package com.aem.molecule
             return _restitution;
         }
 
-        public function init(world:b2World):b2Body
-        {
-            throw new Error("Method not overridden.");
-        }
-
         protected function p2m(pixels:Number):Number
         {
             return pixels / 30;
+        }
+
+        /** 
+         * Initilize the actor's physical representation. 
+         */
+        public virtual function init(world:b2World):b2Body
+        {
+            // TODO correctly implement virtual function
+            throw new Error("Method not overridden");
         }
 
     }

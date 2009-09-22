@@ -155,8 +155,8 @@ package com.aem.molecule
                 var child:DisplayObject = _sprite.getChildAt(i);
                 if (child is Body)
                     initBody(Body(child));
-                else if (child is Entity)
-                    Entity(child).init(_world);
+                else if (child is PhysicalEntity)
+                    PhysicalEntity(child).init(_world);
             }
         }
 
@@ -181,9 +181,9 @@ package com.aem.molecule
                     body.m_userData.y = m2p(body.GetPosition().y);
                     body.m_userData.rotation = body.GetAngle() * (180 / Math.PI);
                 }
-                if (body.m_userData is Body)
+                if (body.m_userData is ActiveEntity)
                 {
-                    Body(body.m_userData).update();
+                    ActiveEntity(body.m_userData).update();
                 }
             }
 

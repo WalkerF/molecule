@@ -6,7 +6,7 @@ package com.aem.molecule
     import Box2D.Collision.Shapes.*;
     import Box2D.Common.Math.*;
 
-    public class RectangularBody extends Entity 
+    public class RectangularBody extends PhysicalEntity 
     {
 
         public function RectangularBody():void

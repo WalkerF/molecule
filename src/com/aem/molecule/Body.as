@@ -10,7 +10,7 @@ package com.aem.molecule
     import Box2D.Collision.Shapes.*;
     import Box2D.Common.Math.*;
 
-    public class Body extends Entity
+    public class Body extends PhysicalEntity implements ActiveEntity
     {
 
         private var _listener:GroundedContactListener;

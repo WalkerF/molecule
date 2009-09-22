@@ -6,7 +6,7 @@ package com.aem.molecule
     import Box2D.Collision.Shapes.*;
     import Box2D.Common.Math.*;
 
-    public class CircularBody extends Entity
+    public class CircularBody extends PhysicalEntity
     {
 
         public function CircularBody():void
