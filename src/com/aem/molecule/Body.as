@@ -16,11 +16,12 @@ package com.aem.molecule
 
         public static const LANDED_IN_LAVA:String = "landedInLava";
 
-        private var _listener:GroundedContactListener;
         private var _body:b2Body;
         private var _movement_speed:Number;
         private var _jump_speed:Number;
         private var _moving:Boolean;
+        private var _jumping:uint;
+        private var _burning:Boolean;
         private var _keysDown:Array = [];
         private var _temp:Number = 0;
         private var _sprite:Sprite;
@@ -84,7 +85,7 @@ package com.aem.molecule
             if (_keysDown[Keyboard.RIGHT] && scaleX > 0)
                 scaleX *= -1;
 
-            if (_listener.grounded)
+            if (!_jumping)
             {
                 gotoAndStop("idle");
                 if (_moving)
@@ -96,7 +97,7 @@ package com.aem.molecule
                     gotoAndStop("peeking");
                 }
             }
-            if (_listener.burned)
+            if (_burning)
             {
                 _temp++;
                 if (_temp > 15)
@@ -107,7 +108,7 @@ package com.aem.molecule
                 else
                     _temp = 0;
             }
-            _listener.burned = false;
+            _burning = false;
             _sprite.alpha = _temp / 15;
         }
 
@@ -118,10 +119,10 @@ package com.aem.molecule
             if (e.keyCode == Keyboard.LEFT || e.keyCode == Keyboard.RIGHT)
                 _moving = true;
 
-            if (e.keyCode == Keyboard.SPACE && _listener.grounded)
+            if (e.keyCode == Keyboard.SPACE && !_jumping)
             {
                 gotoAndStop("jumping");
-                _listener.grounded = false;
+                _jumping = 8;
                 _body.ApplyImpulse(new b2Vec2(0, -_jump_speed), _body.GetWorldCenter());
             }
         }
@@ -164,10 +165,26 @@ package com.aem.molecule
 
             _body.SetMassFromShapes();
 
-            _listener = new GroundedContactListener("ground_sensor");
-            world.SetContactListener(_listener);
+            CollisionListener(world.m_contactListener).register("ground_sensor", onGround);
 
             return _body;
+        }
+
+        private function onGround(point:b2ContactPoint):void
+        {
+            if (point.shape1.GetUserData() == "lava" ||
+                point.shape2.GetUserData() == "lava")
+            {
+                _burning = true;
+                return; // stop evaluating the event
+            }
+
+            if (point.shape1.GetUserData() == "ground_sensor" ||
+                point.shape2.GetUserData() == "ground_sensor")
+            {
+                if (_jumping)
+                    _jumping--;
+            }
         }
     }
 }

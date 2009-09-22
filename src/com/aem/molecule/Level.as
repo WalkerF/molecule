@@ -28,7 +28,8 @@ package com.aem.molecule
         private var _camera:Camera;
 
         private var _world:b2World;
-        private var _listener:BoundarySweeper;
+        private var _boundarySweeper:BoundarySweeper;
+        private var _collisionListener:CollisionListener;
         private var _subject:b2Body;
         private var _gravity:b2Vec2 = new b2Vec2(0, STARTING_GRAVITY);
         private var _starting_body_size:Number; // in pixels
@@ -147,8 +148,11 @@ package com.aem.molecule
 
             _world = new b2World(worldAABB, _gravity, true);
 
-            _listener = new BoundarySweeper();
-            _world.SetBoundaryListener(_listener);
+            _boundarySweeper = new BoundarySweeper();
+            _world.SetBoundaryListener(_boundarySweeper);
+
+            _collisionListener = new CollisionListener();
+            _world.SetContactListener(_collisionListener);
         }
 
         private function m2p(meters:Number):Number
@@ -198,13 +202,13 @@ package com.aem.molecule
 
             _camera.update();
 
-            for each (var outOfBoundsBody:b2Body in _listener.bodies)
+            for each (var outOfBoundsBody:b2Body in _boundarySweeper.bodies)
             {
                 _sprite.removeChild(outOfBoundsBody.GetUserData());
                 outOfBoundsBody.SetUserData(null);
                 _world.DestroyBody(outOfBoundsBody);
             }
-            _listener.clear();
+            _boundarySweeper.clear();
 
             if (_game_over)
                 dispatchEvent(new Event(GAME_OVER));
