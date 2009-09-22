@@ -1,6 +1,7 @@
 
 package com.aem.molecule
 {
+    import flash.display.Sprite;
     import flash.events.Event;
     import flash.events.KeyboardEvent;
     import flash.ui.Keyboard;
@@ -13,13 +14,16 @@ package com.aem.molecule
     public class Body extends PhysicalEntity implements ActiveEntity
     {
 
+        public static const LANDED_IN_LAVA:String = "landedInLava";
+
         private var _listener:GroundedContactListener;
         private var _body:b2Body;
         private var _movement_speed:Number;
         private var _jump_speed:Number;
         private var _moving:Boolean;
         private var _keysDown:Array = [];
-
+        private var _temp:Number = 0;
+        private var _sprite:Sprite;
 
         public function Body():void
         {
@@ -31,6 +35,11 @@ package com.aem.molecule
 
             addEventListener(Event.ADDED_TO_STAGE, setup);
             addEventListener(Event.REMOVED_FROM_STAGE, teardown);
+
+            _sprite = new Sprite();
+            _sprite.graphics.beginFill(0xff0000);
+            _sprite.graphics.drawRect(-width / 2, -height / 2, width, height);
+            addChild(_sprite);
         }
 
         public function set movement_speed(value:Number):void
@@ -87,6 +96,19 @@ package com.aem.molecule
                     gotoAndStop("peeking");
                 }
             }
+            if (_listener.burned)
+            {
+                _temp++;
+                if (_temp > 15)
+                    dispatchEvent(new Event(LANDED_IN_LAVA));
+            } else {
+                if (_temp > 0)
+                    _temp -= .4;
+                else
+                    _temp = 0;
+            }
+            _listener.burned = false;
+            _sprite.alpha = _temp / 15;
         }
 
         private function onKeyPress(e:KeyboardEvent):void

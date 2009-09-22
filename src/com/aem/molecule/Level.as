@@ -15,6 +15,8 @@ package com.aem.molecule
 
     public class Level extends Sprite
     {
+        public static const GAME_OVER:String = "gameOver";
+
         private static const ITERATIONS:uint = 10;
         private static const TIMESTEP:Number = 1 / 30;
         private static const STARTING_GRAVITY:Number = 30;
@@ -30,6 +32,9 @@ package com.aem.molecule
         private var _subject:b2Body;
         private var _gravity:b2Vec2 = new b2Vec2(0, STARTING_GRAVITY);
         private var _starting_body_size:Number; // in pixels
+
+        private var _added_to_stage:Boolean;
+        private var _game_over:Boolean;
 
         public function Level(sprite:Sprites, sliders:Sliders):void
         {
@@ -51,6 +56,10 @@ package com.aem.molecule
 
         private function setup(e:Event):void
         {
+            if (_added_to_stage)
+                return;
+
+            _added_to_stage = true;
             addEventListener(Event.ENTER_FRAME, update);
 
             initWorld();
@@ -88,7 +97,6 @@ package com.aem.molecule
         private function changeSize(e:SliderEvent):void
         {
             _world.DestroyBody(_subject);
-            trace(e.value / 6);
             _subject.GetUserData().width  = _starting_body_size * (e.value / 6);
             _subject.GetUserData().height = _starting_body_size * (e.value / 6);
             _subject = createBody(_starting_body_size * (e.value / 6));
@@ -167,6 +175,7 @@ package com.aem.molecule
             _subject = createBody(body.width);
             body.movement_speed = STARTING_SPEED;
             body.jump_speed = STARTING_JUMP;
+            body.addEventListener(Body.LANDED_IN_LAVA, gameOver);
         }
 
         private function update(e:Event):void
@@ -196,10 +205,14 @@ package com.aem.molecule
                 _world.DestroyBody(outOfBoundsBody);
             }
             _listener.clear();
+
+            if (_game_over)
+                dispatchEvent(new Event(GAME_OVER));
         }
 
         private function destroyBodies():void
         {
+            _subject.GetUserData().removeEventListener(Body.LANDED_IN_LAVA, gameOver);
             for (var body:b2Body = _world.m_bodyList; body; body = body.m_next)
             {
                 body.SetUserData(null);
@@ -221,5 +234,11 @@ package com.aem.molecule
             _sliders._jumpSlider.removeEventListener(SliderEvent.CHANGE, changeJump);
             _sliders._gravitySlider.removeEventListener(SliderEvent.CHANGE, changeGravity);
         }
+
+        private function gameOver(e:Event):void
+        {
+            _game_over = true;
+        }
+
     }
 }

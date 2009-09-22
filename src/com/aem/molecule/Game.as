@@ -17,14 +17,18 @@ package com.aem.molecule
             addEventListener(Event.ADDED_TO_STAGE, setup);
         }
 
-        private function restart():void
+        private function restart(e:Event = null):void
         {
             var sprites:Sprites = new Sprites();
             var sliders:Sliders = new Sliders();
 
             if (_level)
+            {
+                _level.removeEventListener(Level.GAME_OVER, restart);
                 removeChild(_level);
+            }
             _level = new Level(sprites, sliders);
+            _level.addEventListener(Level.GAME_OVER, restart);
             addChild(_level);
         }
 

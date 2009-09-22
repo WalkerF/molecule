@@ -11,7 +11,8 @@ package
 
         public function Molecule():void
         {
-            addChild(new Game());
+            var game:Game = new Game();
+            addChild(game);
         }
     }
 }
