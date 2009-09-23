@@ -4,7 +4,7 @@
 
     <taskdef resource="flexTasks.tasks" />
 
-    <property name="main.file" value="Molecule.as" />
+    <property name="main.file" value="Volcanic.as" />
     <property name="src.dir" value="src" />
     <property name="lib.dir" value="lib" />
     <property name="res.dir" value="res" />
