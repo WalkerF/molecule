@@ -1,17 +1,17 @@
 
-package com.aem.molecule
+package com.aem.molecule.entities
 {
     import Box2D.Dynamics.*;
     import Box2D.Collision.*;
     import Box2D.Collision.Shapes.*;
     import Box2D.Common.Math.*;
 
-    public class StaticEntity extends PhysicalEntity 
+    public class RectangularEntity extends PhysicalEntity 
     {
 
-        public function StaticEntity():void
+        public function RectangularEntity():void
         {
-            _density = 0;
+            _density = 2;
             _friction = .4;
             _restitution = 0;
         }
@@ -26,6 +26,7 @@ package com.aem.molecule
             boxDef.SetAsBox(p2m(width / 2), p2m(height / 2));
             boxDef.friction = friction;
             boxDef.density = density;
+            boxDef.restitution = restitution;
 
             var body:b2Body = world.CreateBody(bodyDef);
             body.CreateShape(boxDef);
@@ -33,6 +34,5 @@ package com.aem.molecule
 
             return body;
         }
-
     }
 }

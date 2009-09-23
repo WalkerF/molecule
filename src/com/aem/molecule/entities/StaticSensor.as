@@ -1,5 +1,5 @@
 
-package com.aem.molecule
+package com.aem.molecule.entities
 {
     import Box2D.Dynamics.*;
     import Box2D.Collision.*;

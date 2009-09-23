@@ -11,9 +11,9 @@ package com.aem.prototype.volcanic
     import Box2D.Collision.Shapes.*;
     import Box2D.Common.Math.*;
 
-    import com.aem.molecule.ActiveEntity;
     import com.aem.molecule.CollisionListener;
-    import com.aem.molecule.PhysicalEntity;
+    import com.aem.molecule.entities.ActiveEntity;
+    import com.aem.molecule.entities.PhysicalEntity;
 
     public class Body extends PhysicalEntity implements ActiveEntity
     {

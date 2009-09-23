@@ -1,19 +1,19 @@
 
-package com.aem.molecule
+package com.aem.molecule.entities
 {
     import Box2D.Dynamics.*;
     import Box2D.Collision.*;
     import Box2D.Collision.Shapes.*;
     import Box2D.Common.Math.*;
 
-    public class RectangularEntity extends PhysicalEntity 
+    public class CircularEntity extends PhysicalEntity
     {
 
-        public function RectangularEntity():void
+        public function CircularEntity():void
         {
-            _density = 2;
-            _friction = .4;
-            _restitution = 0;
+            _density = 1;
+            _friction = .8;
+            _restitution = .2;
         }
 
         public override function init(world:b2World):b2Body
@@ -22,14 +22,14 @@ package com.aem.molecule
             bodyDef.position.Set(p2m(x), p2m(y) );
             bodyDef.userData = this;
 
-            var boxDef:b2PolygonDef = new b2PolygonDef();
-            boxDef.SetAsBox(p2m(width / 2), p2m(height / 2));
-            boxDef.friction = friction;
-            boxDef.density = density;
-            boxDef.restitution = restitution;
+            var circleDef:b2CircleDef = new b2CircleDef();
+            circleDef.radius = p2m(width / 2);
+            circleDef.friction = friction;
+            circleDef.density = density;
+            circleDef.restitution = restitution;
 
             var body:b2Body = world.CreateBody(bodyDef);
-            body.CreateShape(boxDef);
+            body.CreateShape(circleDef);
             body.SetMassFromShapes();
 
             return body;
