@@ -113,7 +113,7 @@ package com.aem.prototype.volcanic
                     _temp = 0;
             }
             _burning = false;
-            _sprite.alpha = _temp / 15;
+            _sprite.alpha = _temp / 25;
         }
 
         private function onKeyPress(e:KeyboardEvent):void
