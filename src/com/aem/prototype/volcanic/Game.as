@@ -1,5 +1,5 @@
 
-package com.aem.molecule
+package com.aem.prototype.volcanic
 {
     import flash.display.Sprite;
     import flash.events.Event;

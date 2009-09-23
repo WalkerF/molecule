@@ -1,5 +1,5 @@
 
-package com.aem.molecule
+package com.aem.prototype.volcanic
 {
     import flash.display.Sprite;
     import flash.events.Event;
@@ -10,6 +10,10 @@ package com.aem.molecule
     import Box2D.Collision.*;
     import Box2D.Collision.Shapes.*;
     import Box2D.Common.Math.*;
+
+    import com.aem.molecule.ActiveEntity;
+    import com.aem.molecule.CollisionListener;
+    import com.aem.molecule.PhysicalEntity;
 
     public class Body extends PhysicalEntity implements ActiveEntity
     {
