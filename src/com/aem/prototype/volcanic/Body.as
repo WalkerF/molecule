@@ -126,7 +126,7 @@ package com.aem.prototype.volcanic
             if (e.keyCode == Keyboard.SPACE && !_jumping)
             {
                 gotoAndStop("jumping");
-                _jumping = 8;
+                _jumping = 6;
                 _body.ApplyImpulse(new b2Vec2(0, -_jump_speed), _body.GetWorldCenter());
             }
         }
