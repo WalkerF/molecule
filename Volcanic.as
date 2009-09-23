@@ -6,10 +6,10 @@ package
     import com.aem.prototype.volcanic.Game;
 
     [SWF(width="550", height="400", frameRate="30")]
-    public class Molecule extends Sprite
+    public class Volcanic extends Sprite
     {
 
-        public function Molecule():void
+        public function Volcanic():void
         {
             var game:Game = new Game();
             addChild(game);
