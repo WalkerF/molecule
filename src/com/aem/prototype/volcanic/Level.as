@@ -13,10 +13,10 @@ package com.aem.prototype.volcanic
     import Box2D.Collision.Shapes.*;
     import Box2D.Common.Math.*;
 
-    import com.aem.molecule.BoundarySweeper;
-    import com.aem.molecule.CollisionListener;
     import com.aem.molecule.entities.ActiveEntity;
     import com.aem.molecule.entities.PhysicalEntity;
+    import com.aem.molecule.entities.listeners.BoundarySweeper;
+    import com.aem.molecule.entities.listeners.CollisionListener;
     import com.aem.molecule.view.Camera;
 
     public class Level extends Sprite
