@@ -1,5 +1,5 @@
 
-package com.aem.molecule
+package com.aem.molecule.view
 {
 
     import flash.display.Sprite;
