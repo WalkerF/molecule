@@ -21,11 +21,19 @@ package com.aem.molecule.entities
         {
             var bodyDef:b2BodyDef = new b2BodyDef();
             bodyDef.position.Set(p2m(x), p2m(y));
+            bodyDef.angle = rotation * Math.PI / 180;
+
+            // caching the rotation so we can correctly set the width
+            var r:Number = rotation;
+            rotation = 0;
 
             var sensor:b2PolygonDef = new b2PolygonDef();
             sensor.isSensor = true;
             sensor.userData = name;
             sensor.SetAsOrientedBox(p2m(width / 2), p2m(height / 2), new b2Vec2(0, 0), 0);
+
+            // setting back the shapes rotation
+            rotation = r;
 
             var body:b2Body = world.CreateBody(bodyDef);
             body.CreateShape(sensor);
