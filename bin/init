@@ -13,10 +13,12 @@ FLEX_HOME=~/Source/flex_sdk_3.4
 FLEX_BIN=$FLEX_HOME/bin
 
 PROJECT_BIN=~/Source/mole/bin
+PROJECT_MAIN=Volcanic.as
 PROJECT_EXE=Volcanic.swf
 PROJECT_DEBUGGER="/Applications/Adobe Flash CS4/Players/Debug/Flash Player.app"
 
 export PATH=$PATH:$FLEX_BIN:$PROJECT_BIN
 export FLEX_HOME=$FLEX_HOME
+export PROJECT_MAIN=$PROJECT_MAIN
 export PROJECT_EXE=$PROJECT_EXE
 export PROJECT_DEBUGGER=$PROJECT_DEBUGGER

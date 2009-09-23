@@ -4,14 +4,15 @@
 
     <taskdef resource="flexTasks.tasks" />
 
-    <property name="main.file" value="Volcanic.as" />
+    <!-- FLEX_HOME is expected to be passed in at the command line. -->
+    <!-- MAIN_FILE is expected to be passed in at the command line. -->
     <property name="src.dir" value="src" />
     <property name="lib.dir" value="lib" />
     <property name="res.dir" value="res" />
 
     <!-- Default task; builds the project file. -->
     <target name="build">
-        <mxmlc file="${main.file}" as3="true" incremental="true" debug="true" allow-source-path-overlap="true">
+        <mxmlc file="${MAIN_FILE}" as3="true" incremental="true" debug="true" allow-source-path-overlap="true">
             <default-size width="550" height="400" />
             <metadata description="Proving Grounds for Radical Ideas">
                 <creator name="Alex Schearer" />
