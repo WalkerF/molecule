@@ -6,14 +6,14 @@ package com.aem.molecule
     import Box2D.Collision.Shapes.*;
     import Box2D.Common.Math.*;
 
-    public class CircularBody extends PhysicalEntity
+    public class StaticEntity extends PhysicalEntity 
     {
 
-        public function CircularBody():void
+        public function StaticEntity():void
         {
-            _density = 1;
-            _friction = .8;
-            _restitution = .2;
+            _density = 0;
+            _friction = .4;
+            _restitution = 0;
         }
 
         public override function init(world:b2World):b2Body
@@ -22,17 +22,17 @@ package com.aem.molecule
             bodyDef.position.Set(p2m(x), p2m(y) );
             bodyDef.userData = this;
 
-            var circleDef:b2CircleDef = new b2CircleDef();
-            circleDef.radius = p2m(width / 2);
-            circleDef.friction = friction;
-            circleDef.density = density;
-            circleDef.restitution = restitution;
+            var boxDef:b2PolygonDef = new b2PolygonDef();
+            boxDef.SetAsBox(p2m(width / 2), p2m(height / 2));
+            boxDef.friction = friction;
+            boxDef.density = density;
 
             var body:b2Body = world.CreateBody(bodyDef);
-            body.CreateShape(circleDef);
+            body.CreateShape(boxDef);
             body.SetMassFromShapes();
 
             return body;
         }
+
     }
 }

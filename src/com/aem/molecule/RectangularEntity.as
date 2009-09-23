@@ -6,12 +6,12 @@ package com.aem.molecule
     import Box2D.Collision.Shapes.*;
     import Box2D.Common.Math.*;
 
-    public class Platform extends PhysicalEntity 
+    public class RectangularEntity extends PhysicalEntity 
     {
 
-        public function Platform():void
+        public function RectangularEntity():void
         {
-            _density = 0;
+            _density = 2;
             _friction = .4;
             _restitution = 0;
         }
@@ -26,6 +26,7 @@ package com.aem.molecule
             boxDef.SetAsBox(p2m(width / 2), p2m(height / 2));
             boxDef.friction = friction;
             boxDef.density = density;
+            boxDef.restitution = restitution;
 
             var body:b2Body = world.CreateBody(bodyDef);
             body.CreateShape(boxDef);
@@ -33,6 +34,5 @@ package com.aem.molecule
 
             return body;
         }
-
     }
 }
