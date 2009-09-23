@@ -13,11 +13,11 @@ package com.aem.prototype.volcanic
     import Box2D.Collision.Shapes.*;
     import Box2D.Common.Math.*;
 
+    import com.aem.molecule.Game;
     import com.aem.molecule.entities.ActiveEntity;
     import com.aem.molecule.entities.PhysicalEntity;
     import com.aem.molecule.entities.listeners.BoundarySweeper;
     import com.aem.molecule.entities.listeners.CollisionListener;
-    import com.aem.molecule.view.Camera;
 
     public class Level extends Sprite
     {
@@ -30,8 +30,6 @@ package com.aem.prototype.volcanic
         private static const STARTING_JUMP:Number = 15;
 
         private var _sprite:Sprites;
-        private var _sliders:Sliders;
-        private var _camera:Camera;
 
         private var _world:b2World;
         private var _boundarySweeper:BoundarySweeper;
@@ -43,62 +41,29 @@ package com.aem.prototype.volcanic
         private var _added_to_stage:Boolean;
         private var _game_over:Boolean;
 
-        public function Level(sprite:Sprites, sliders:Sliders):void
+        public function Level(sprite:Sprites):void
         {
-            _camera = new Camera();
-            addChild(_camera);
-
             _sprite = sprite;
-            _camera.addChild(_sprite);
-            _camera.follow(_sprite._body);
-
-            addEventListener(Event.ADDED_TO_STAGE, setup);
-            addEventListener(Event.REMOVED_FROM_STAGE, teardown);
-
-            _sliders = sliders;
-            _sliders.x = 10;
-            _sliders.y = 10;
-            addChild(_sliders);
+            addChild(_sprite);
         }
 
-        private function setup(e:Event):void
+        public function init(game:Game):void
         {
             if (_added_to_stage)
                 return;
 
             _added_to_stage = true;
-            addEventListener(Event.ENTER_FRAME, update);
 
+            game.camera.follow(_sprite._body);
             initWorld();
             initBodies();
             //initDebug();
-
-            setupSliders();
         }
 
-        private function teardown(e:Event):void
+        public function destroy():void
         {
-            removeEventListener(Event.ENTER_FRAME, update);
-
             destroyBodies();
             destroyWorld();
-
-            destroySliders();
-        }
-
-        private function setupSliders():void
-        {
-            _sliders._sizeSlider.addEventListener(SliderEvent.CHANGE, changeSize);
-            _sliders._sizeSlider.focusEnabled = false;
-
-            _sliders._speedSlider.addEventListener(SliderEvent.CHANGE, changeSpeed);
-            _sliders._speedSlider.focusEnabled = false;
-
-            _sliders._jumpSlider.addEventListener(SliderEvent.CHANGE, changeJump);
-            _sliders._jumpSlider.focusEnabled = false;
-
-            _sliders._gravitySlider.addEventListener(SliderEvent.CHANGE, changeGravity);
-            _sliders._gravitySlider.focusEnabled = false;
         }
 
         private function changeSize(e:SliderEvent):void
@@ -187,7 +152,7 @@ package com.aem.prototype.volcanic
             body.addEventListener(Body.LANDED_IN_LAVA, gameOver);
         }
 
-        private function update(e:Event):void
+        public function update():void
         {
             _world.Step(TIMESTEP, ITERATIONS);
 
@@ -205,7 +170,7 @@ package com.aem.prototype.volcanic
                 }
             }
 
-            _camera.update();
+            //_camera.update();
 
             for each (var outOfBoundsBody:b2Body in _boundarySweeper.bodies)
             {
@@ -234,14 +199,6 @@ package com.aem.prototype.volcanic
             _world.SetContactListener(null); // TODO move this to Body
             _world.SetBoundaryListener(null);
             _world = null;
-        }
-
-        private function destroySliders():void
-        {
-            _sliders._sizeSlider.removeEventListener(SliderEvent.CHANGE, changeSize);
-            _sliders._speedSlider.removeEventListener(SliderEvent.CHANGE, changeSpeed);
-            _sliders._jumpSlider.removeEventListener(SliderEvent.CHANGE, changeJump);
-            _sliders._gravitySlider.removeEventListener(SliderEvent.CHANGE, changeGravity);
         }
 
         private function gameOver(e:Event):void
