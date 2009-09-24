@@ -135,6 +135,11 @@ package com.aem.prototype.volcanic
                     initBody(Body(child));
                 else if (child is PhysicalEntity)
                     PhysicalEntity(child).init(_world);
+
+                if (child is ActiveEntity)
+                {
+                    ActiveEntity(child).create(_game);
+                }
             }
         }
 
@@ -164,7 +169,7 @@ package com.aem.prototype.volcanic
                 }
                 if (body.GetUserData() is ActiveEntity)
                 {
-                    ActiveEntity(body.GetUserData()).update();
+                    ActiveEntity(body.GetUserData()).update(_game);
                 }
             }
 
@@ -187,6 +192,11 @@ package com.aem.prototype.volcanic
             _subject.GetUserData().removeEventListener(Body.LANDED_IN_LAVA, gameOver);
             for (var body:b2Body = _world.m_bodyList; body; body = body.m_next)
             {
+                if (body.GetUserData() is ActiveEntity)
+                {
+                    ActiveEntity(body.GetUserData()).destroy(_game);
+                }
+
                 body.SetUserData(null);
                 _world.DestroyBody(body);
             }
