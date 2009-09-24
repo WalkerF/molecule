@@ -29,6 +29,7 @@ package com.aem.prototype.volcanic
         private static const STARTING_SPEED:Number = 7;
         private static const STARTING_JUMP:Number = 15;
 
+        private var _game:Game;
         private var _sprite:Sprites;
 
         private var _world:b2World;
@@ -38,7 +39,6 @@ package com.aem.prototype.volcanic
         private var _gravity:b2Vec2 = new b2Vec2(0, STARTING_GRAVITY);
         private var _starting_body_size:Number; // in pixels
 
-        private var _added_to_stage:Boolean;
         private var _game_over:Boolean;
 
         public function Level(sprite:Sprites):void
@@ -49,12 +49,8 @@ package com.aem.prototype.volcanic
 
         public function init(game:Game):void
         {
-            if (_added_to_stage)
-                return;
+            _game = game;
 
-            _added_to_stage = true;
-
-            game.camera.follow(_sprite._body);
             initWorld();
             initBodies();
             //initDebug();
@@ -71,7 +67,7 @@ package com.aem.prototype.volcanic
             _world.DestroyBody(_subject);
             _subject.GetUserData().width  = _starting_body_size * (e.value / 6);
             _subject.GetUserData().height = _starting_body_size * (e.value / 6);
-            _subject = createBody(_starting_body_size * (e.value / 6));
+            _subject = createBody(_subject.GetUserData());
         }
 
         private function changeSpeed(e:SliderEvent):void
@@ -90,9 +86,9 @@ package com.aem.prototype.volcanic
             _world.SetGravity(_gravity);
         }
 
-        private function createBody(pixels:Number):b2Body
+        private function createBody(body:Body):b2Body
         {
-            return _sprite._body.init(_world);
+            return body.init(_world);
         }
 
         private function initDebug():void
@@ -146,10 +142,12 @@ package com.aem.prototype.volcanic
         {
             _starting_body_size = body.width;
 
-            _subject = createBody(body.width);
+            _subject = createBody(body);
             body.movement_speed = STARTING_SPEED;
             body.jump_speed = STARTING_JUMP;
             body.addEventListener(Body.LANDED_IN_LAVA, gameOver);
+
+            _game.camera.follow(body);
         }
 
         public function update():void
