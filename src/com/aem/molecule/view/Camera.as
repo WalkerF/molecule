@@ -16,8 +16,16 @@ package com.aem.molecule.view
 
         public function update():void
         {
-            this.x = (stage.stageWidth / 2) - _target.x;
-            this.y = ((stage.stageHeight / 2) + 50) - _target.y;
+        	if(_target)
+        	{
+               this.x = (stage.stageWidth / 2) - _target.x;
+               this.y = ((stage.stageHeight / 2) + 50) - _target.y;
+            }
+            else
+            {
+            	this.x = (stage.stageWidth / 2);
+                this.y = ((stage.stageHeight / 2) + 50);
+            }
         }
 
     }
