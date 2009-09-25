@@ -25,8 +25,11 @@ package com.aem.molecule.view
 				center.y+=sprite.y;
 			}
 
-			center.x/=_targets.length;
-			center.y/=_targets.length;
+			if(_targets.length>0)
+			{
+				center.x/=_targets.length;
+				center.y/=_targets.length;
+			}
 
 			this.x=(stage.stageWidth / 2) - center.x;
 			this.y=((stage.stageHeight / 2) + 50) - center.y;
