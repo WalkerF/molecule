@@ -8,89 +8,52 @@ package com.aem.prototype.towertussles
 	import com.aem.molecule.Game;
 	
 	import flash.display.MovieClip;
+	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.geom.Point;
-	
+
 	public class DraggableBox extends MovieClip
 	{
-		
+
 		private var originalLocation:Point;
 		private var startingLocation:Point;
-		private var world:b2World;
-		private var game:Game;
 		private var hasClick:Boolean;
-		private static const CLICK_MAX_TIMER:Number = 15;
+		private static const CLICK_MAX_TIMER:Number=15;
 		private var clickTimer:Number;
-			
+
 		public function DraggableBox():void
 		{
 			clickTimer=0;
-			originalLocation = new Point();
-			originalLocation.x = this.x;
-			originalLocation.y = this.y;
+			originalLocation=new Point();
+			originalLocation.x=this.x;
+			originalLocation.y=this.y;
 			addEventListener(MouseEvent.MOUSE_DOWN, pickup);
-            addEventListener(MouseEvent.MOUSE_UP, place);
-            //addEventListener(MouseEvent.DOUBLE_CLICK,submit);
-            addEventListener(MouseEvent.CLICK, acknowledgeClick);
+			addEventListener(MouseEvent.MOUSE_UP, place);
+			this.doubleClickEnabled = true;
+			addEventListener(MouseEvent.DOUBLE_CLICK,submit);
+			//addEventListener(MouseEvent.CLICK, acknowledgeClick);
 		}
-		
-		public function init(world:b2World,game:Game):void
+
+		public function pickup(event:MouseEvent):void
 		{
-			this.world = world;
-			this.game=game;
+			var obj:Object=event.currentTarget;
+			this.parent.setChildIndex(this, this.parent.numChildren - 1); // Does not work. Parent doesn't possess other crate
+
+			startingLocation=new Point();
+			startingLocation.x=obj.x;
+			startingLocation.y=obj.y;
+			obj.startDrag();
 		}
-		public function acknowledgeClick(event:MouseEvent):void
+
+		public function submit(e:Event):void
 		{
-			if(hasClick)
-			{
-			   hasClick=false;
-			   submit();
-			   this.x = originalLocation.x;
-			   this.y = originalLocation.y;
-			}
-			else
-			   hasClick=true;
+			dispatchEvent(new Event(Level.SUBMIT_BOX));
 		}
-		
-		public function pickup( event:MouseEvent ):void {
-          var obj:Object = event.currentTarget;     
-          this.parent.setChildIndex(this, this.parent.numChildren-1);          
-          startingLocation = new Point(  );
-          startingLocation.x = obj.x;
-           startingLocation.y = obj.y;      
-            obj.startDrag(  );     
-        }
-        
-        protected function p2m(pixels:Number):Number
-        {
-            return pixels / 30;
-        }
-        
-        public function submit():void
-        {
-        	var box:Box = new Box();
-        	box.x=this.x;
-        	box.y=this.y;      	
-            box.init(this.world);
-            game.camera.addChild(box);
-        }
-        
-        public function place( event:MouseEvent ):void {
-           this.stopDrag(  );
-           this.filters = null;
-        }
-        public function update():void
-        {
-        	if(hasClick)
-        	{
-        		clickTimer++;
-        		if(clickTimer>=30)
-        		{
-        			clickTimer=0;
-        			hasClick=false;
-        		}
-        	}
-        }
-        
+
+		public function place(event:MouseEvent):void
+		{
+			this.stopDrag();
+		}
+
 	}
-} 
+}
