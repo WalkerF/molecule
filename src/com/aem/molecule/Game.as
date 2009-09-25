@@ -7,11 +7,13 @@ package com.aem.molecule
 
     import com.aem.molecule.states.GameState;
     import com.aem.molecule.view.Camera;
+    import com.aem.molecule.view.InputManager;
 
     public class Game extends Sprite
     {
 
         private var _camera:Camera;
+        private var _input:InputManager;
         private var _states:Array;
         private var _current_state:GameState;
 
@@ -20,6 +22,7 @@ package com.aem.molecule
             addEventListener(Event.ENTER_FRAME, update);
             _states = [];
             _camera = new Camera();
+            _input = new InputManager();
         }
 
         public function init():void
@@ -31,6 +34,7 @@ package com.aem.molecule
 
             _current_state.enter(0);
             addChild(_camera);
+            _input.init(stage);
         }
 
         private function update(e:Event):void
@@ -42,6 +46,11 @@ package com.aem.molecule
         public function get camera():Camera
         {
             return _camera;
+        }
+
+        public function get input():InputManager
+        {
+            return _input;
         }
 
         public function add(state:GameState):void
