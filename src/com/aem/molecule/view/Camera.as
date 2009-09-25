@@ -2,22 +2,34 @@
 package com.aem.molecule.view
 {
 
+    import flash.display.DisplayObject;
     import flash.display.Sprite;
+    import flash.geom.Point;
 
     public class Camera extends Sprite
     {
 
-        private var _target:Sprite;
+        private var _targets:Array = [];
 
         public function follow(target:Sprite):void
         {
-            _target = target;
+            _targets.push(target);
         }
 
         public function update():void
         {
-            this.x = (stage.stageWidth / 2) - _target.x;
-            this.y = ((stage.stageHeight / 2) + 50) - _target.y;
+            var center:Point = new Point();
+            for each (var sprite:DisplayObject in _targets)
+            {
+                center.x += sprite.x;
+                center.y += sprite.y;
+            }
+
+            center.x /= _targets.length;
+            center.y /= _targets.length;
+
+            this.x = (stage.stageWidth / 2) - center.x;
+            this.y = ((stage.stageHeight / 2) + 50) - center.y;
         }
 
     }

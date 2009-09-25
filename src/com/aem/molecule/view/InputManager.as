@@ -39,9 +39,9 @@ package com.aem.molecule.view
         private static const PLAYER_ONE_KEYS:Object = {
             LEFT: 74, // j
             RIGHT: 76, // l
-            UP: 73, // i
+            UP: 72, // h
             DOWN: 75, // k
-            PRIMARY: 72, // h
+            PRIMARY: 73, // i
             SECONDARY: 78, // n
             SELECT: Keyboard.ENTER,
             CANCEL: Keyboard.BACKSPACE // delete/backscape
@@ -50,9 +50,9 @@ package com.aem.molecule.view
         private static const PLAYER_TWO_KEYS:Object = {
             LEFT: 65, // a
             RIGHT:  68, // d
-            UP: 87, // w
+            UP: 70, // f
             DOWN: 83, // s
-            PRIMARY: 70, // f
+            PRIMARY: 87, // w
             SECONDARY: 67, // c
             SELECT: Keyboard.CAPS_LOCK, // caps lock
             CANCEL: Keyboard.ESCAPE// escape
