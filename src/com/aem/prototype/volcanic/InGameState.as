@@ -8,6 +8,7 @@ package com.aem.prototype.volcanic
 
     import com.aem.molecule.Game;
     import com.aem.molecule.states.GameState;
+    import com.aem.molecule.view.Camera;
 
     public class InGameState implements GameState
     {
@@ -35,6 +36,7 @@ package com.aem.prototype.volcanic
         public function init(game:Game):void
         {
             _game = game;
+            _game.camera.add(new Background(), Camera.BACKGROUND);
         }
 
         public function update(game:Game):void

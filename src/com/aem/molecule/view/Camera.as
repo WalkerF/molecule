@@ -81,8 +81,10 @@ package com.aem.molecule.view
             center.x /= _targets.length;
             center.y /= _targets.length;
 
-            this.x = (stage.stageWidth / 2) - center.x;
-            this.y = ((stage.stageHeight / 2) + 50) - center.y;
+            _layers[STAGE].x = (stage.stageWidth / 2) - center.x;
+            _layers[STAGE].y = ((stage.stageHeight / 2) + 50) - center.y;
+            _layers[SERVICE].x = (stage.stageWidth / 2) - center.x;
+            _layers[SERVICE].y = ((stage.stageHeight / 2) + 50) - center.y;
 
             updateThumbnails(center);
         }
@@ -90,7 +92,7 @@ package com.aem.molecule.view
         private function updateThumbnails(center:Point):void
         {
             for (var i:uint = 0; i < _targets.length; i++) {
-                if ((_targets[i].x + this.x) < 0)
+                if ((_targets[i].x + _layers[STAGE].x) < 0)
                 {
                     if (!_thumbnails[i].visible)
                     {
@@ -109,7 +111,7 @@ package com.aem.molecule.view
                     }
                 }
 
-                if ((_targets[i].x + this.x) > stage.stageWidth)
+                if ((_targets[i].x + _layers[STAGE].x) > stage.stageWidth)
                 {
                     if (!_thumbnails[i].visible)
                     {
