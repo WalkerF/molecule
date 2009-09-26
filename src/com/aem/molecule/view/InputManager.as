@@ -112,6 +112,9 @@ package com.aem.molecule.view
         private function onKeyPress(e:KeyboardEvent):void
         {
             for (var i:uint = 0; i < PLAYER_PROFILES.length; i++) {
+                if (!_players[i])
+                    continue;
+
                 var player:Object = PLAYER_PROFILES[i];
                 for (var key:String in player)
                 {
@@ -128,6 +131,9 @@ package com.aem.molecule.view
         private function onKeyRelease(e:KeyboardEvent):void
         {
             for (var i:uint = 0; i < PLAYER_PROFILES.length; i++) {
+                if (!_players[i])
+                    continue;
+
                 var player:Object = PLAYER_PROFILES[i];
                 for (var key:String in player)
                 {

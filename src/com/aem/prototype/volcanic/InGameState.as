@@ -8,6 +8,7 @@ package com.aem.prototype.volcanic
 
     import com.aem.molecule.Game;
     import com.aem.molecule.states.GameState;
+    import com.aem.molecule.view.Camera;
 
     public class InGameState implements GameState
     {
@@ -35,6 +36,8 @@ package com.aem.prototype.volcanic
         public function init(game:Game):void
         {
             _game = game;
+            _game.camera.add(new Background(), Camera.BACKGROUND);
+            _game.camera.add(new Foreground(), Camera.FOREGROUND);
         }
 
         public function update(game:Game):void
@@ -50,12 +53,12 @@ package com.aem.prototype.volcanic
             {
                 _level.removeEventListener(Level.GAME_OVER, restart);
                 _level.destroy();
-                _game.camera.removeChild(_level);
+                _game.camera.remove(_level);
             }
             _level = new Level(sprites);
             _level.init(_game);
             _level.addEventListener(Level.GAME_OVER, restart);
-            _game.camera.addChild(_level);
+            _game.camera.add(_level);
         }
 
         private function onKeyPress(e:KeyboardEvent):void
