@@ -62,6 +62,7 @@ package com.aem.prototype.volcanic
 
         public function destroy(game:Game):void
         {
+            _thumbnail = null;
             game.input.unregister(this);
         }
 

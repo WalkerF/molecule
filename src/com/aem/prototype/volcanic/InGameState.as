@@ -37,6 +37,7 @@ package com.aem.prototype.volcanic
         {
             _game = game;
             _game.camera.add(new Background(), Camera.BACKGROUND);
+            _game.camera.add(new Foreground(), Camera.FOREGROUND);
         }
 
         public function update(game:Game):void
@@ -52,7 +53,7 @@ package com.aem.prototype.volcanic
             {
                 _level.removeEventListener(Level.GAME_OVER, restart);
                 _level.destroy();
-                _game.camera.removeChild(_level);
+                _game.camera.remove(_level);
             }
             _level = new Level(sprites);
             _level.init(_game);

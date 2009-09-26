@@ -49,7 +49,7 @@ package com.aem.molecule.view
 
         public function remove(child:DisplayObject, layer:uint = STAGE):void
         {
-            _layers[layer].remove(child);
+            _layers[layer].removeChild(child);
         }
 
         /**
@@ -64,6 +64,20 @@ package com.aem.molecule.view
             bubble.visible = false;
             add(bubble, SERVICE);
             _thumbnails.push(bubble);
+        }
+
+        public function unfollow(target:DisplayObject):void
+        {
+            for (var i:uint = 0; i < _targets.length; i++) {
+                if (_targets[i] == target)
+                {
+                    _targets.splice(i, 1);
+                    var removed:Array = _thumbnails.splice(i, 1);
+                    if (removed.length)
+                        _layers[SERVICE].removeChild(removed[0]);
+                    break;
+                }
+            }
         }
 
         public function update():void
@@ -85,6 +99,8 @@ package com.aem.molecule.view
             _layers[STAGE].y = ((stage.stageHeight / 2) + 50) - center.y;
             _layers[SERVICE].x = (stage.stageWidth / 2) - center.x;
             _layers[SERVICE].y = ((stage.stageHeight / 2) + 50) - center.y;
+            _layers[FOREGROUND].x = 2 * ((stage.stageWidth / 2) - center.x);
+            _layers[FOREGROUND].y = ((stage.stageHeight / 2) + 50) - center.y;
 
             updateThumbnails(center);
         }

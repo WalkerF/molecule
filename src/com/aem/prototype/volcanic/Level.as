@@ -167,6 +167,7 @@ package com.aem.prototype.volcanic
             {
                 if (body.GetUserData() is ActiveEntity)
                 {
+                    _game.camera.unfollow(body.GetUserData());
                     ActiveEntity(body.GetUserData()).destroy(_game);
                 }
 
