@@ -55,7 +55,7 @@ package com.aem.prototype.volcanic
             _level = new Level(sprites);
             _level.init(_game);
             _level.addEventListener(Level.GAME_OVER, restart);
-            _game.camera.addChild(_level);
+            _game.camera.add(_level);
         }
 
         private function onKeyPress(e:KeyboardEvent):void

@@ -5,9 +5,6 @@ package com.aem.prototype.volcanic
     import flash.display.DisplayObject;
     import flash.events.Event;
 
-    import fl.controls.Slider;
-    import fl.events.SliderEvent;
-
     import Box2D.Dynamics.*;
     import Box2D.Collision.*;
     import Box2D.Collision.Shapes.*;
@@ -60,30 +57,6 @@ package com.aem.prototype.volcanic
         {
             destroyBodies();
             destroyWorld();
-        }
-
-        private function changeSize(e:SliderEvent):void
-        {
-            _world.DestroyBody(_subject);
-            _subject.GetUserData().width  = _starting_body_size * (e.value / 6);
-            _subject.GetUserData().height = _starting_body_size * (e.value / 6);
-            _subject = createBody(_subject.GetUserData());
-        }
-
-        private function changeSpeed(e:SliderEvent):void
-        {
-            _subject.GetUserData().movement_speed = STARTING_SPEED * (e.value / 6);
-        }
-
-        private function changeJump(e:SliderEvent):void
-        {
-            _subject.GetUserData().jump_speed = STARTING_JUMP * (e.value / 6);
-        }
-
-        private function changeGravity(e:SliderEvent):void
-        {
-            _gravity.y = STARTING_GRAVITY* (e.value / 6);
-            _world.SetGravity(_gravity);
         }
 
         private function createBody(body:Body):b2Body

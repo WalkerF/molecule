@@ -1,7 +1,9 @@
 
 package com.aem.prototype.volcanic
 {
+    import flash.display.DisplayObject;
     import flash.display.Sprite;
+    import flash.display.MovieClip;
     import flash.events.Event;
     import flash.events.KeyboardEvent;
 
@@ -16,8 +18,9 @@ package com.aem.prototype.volcanic
     import com.aem.molecule.entities.listeners.CollisionListener;
     import com.aem.molecule.view.InputListener;
     import com.aem.molecule.view.InputManager;
+    import com.aem.molecule.view.Trackable;
 
-    public class Body extends PhysicalEntity implements ActiveEntity, InputListener
+    public class Body extends PhysicalEntity implements ActiveEntity, InputListener, Trackable
     {
 
         public static const LANDED_IN_LAVA:String = "landedInLava";
@@ -31,6 +34,8 @@ package com.aem.prototype.volcanic
         private var _keysDown:Array = [];
         private var _temp:Number = 0;
         private var _sprite:Sprite;
+        private var _player_id:uint;
+        private var _thumbnail:MovieClip;
 
         public function Body():void
         {
@@ -38,7 +43,10 @@ package com.aem.prototype.volcanic
             _friction = .4;
             _restitution = 0;
 
+            _thumbnail = new BodyThumbnail();
+
             gotoAndStop("idle");
+            _thumbnail.gotoAndStop("idle");
 
             _sprite = new Sprite();
             _sprite.graphics.beginFill(0xff0000);
@@ -48,7 +56,8 @@ package com.aem.prototype.volcanic
 
         public function create(game:Game):void
         {
-            game.input.register(game.input.generatePlayerID(), this);
+            _player_id = game.input.generatePlayerID();
+            game.input.register(_player_id, this);
         }
 
         public function destroy(game:Game):void
@@ -82,20 +91,30 @@ package com.aem.prototype.volcanic
             _body.m_sweep.a = 0;
 
             if (_keysDown[InputManager.LEFT] && scaleX < 0)
+            {
                 scaleX *= -1;
+                _thumbnail.scaleX *= -1;
+            }
             if (_keysDown[InputManager.RIGHT] && scaleX > 0)
+            {
                 scaleX *= -1;
+                _thumbnail.scaleX *= -1;
+            }
 
             if (!_jumping)
             {
                 gotoAndStop("idle");
+                _thumbnail.gotoAndStop("idle");
                 if (_moving)
                 {
                     gotoAndStop("running");
+                    _thumbnail.gotoAndStop("running");
                 } else if (_keysDown[InputManager.DOWN]) {
                     gotoAndStop("crouching");
+                    _thumbnail.gotoAndStop("crouching");
                 } else if (_keysDown[InputManager.UP]) {
                     gotoAndStop("peeking");
+                    _thumbnail.gotoAndStop("peeking");
                 }
             }
             if (_burning)
@@ -123,6 +142,7 @@ package com.aem.prototype.volcanic
             if (e.keyCode == InputManager.PRIMARY && !_jumping)
             {
                 gotoAndStop("jumping");
+                _thumbnail.gotoAndStop("jumping");
                 _jumping = 6;
                 _body.ApplyImpulse(new b2Vec2(0, -_jump_speed), _body.GetWorldCenter());
             }
@@ -186,6 +206,16 @@ package com.aem.prototype.volcanic
                 if (_jumping)
                     _jumping--;
             }
+        }
+
+        public override function toString():String
+        {
+            return "Player " + _player_id;
+        }
+
+        public function getThumbnail():DisplayObject
+        {
+            return _thumbnail;
         }
     }
 }
