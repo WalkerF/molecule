@@ -18,12 +18,12 @@ package com.aem.prototype.towertussles
 
 		public function overRotateSpot(e:MouseEvent):void
 		{
+			this.parent.addChild(this);
 			Mouse.hide();
 			mouseEnabled=false;
 			mouseChildren=false;
-			var p:Point=new Point(this.camera.mouseX, this.camera.mouseY);
-			this.x=p.x;
-			this.y=p.y;
+			this.x=stage.mouseX;
+			this.y=stage.mouseY;
 			startDrag();
 			this.visible=true;
 		}
@@ -33,8 +33,7 @@ package com.aem.prototype.towertussles
 			stopDrag();
 			Mouse.show();
 			mouseEnabled = true;
-			mouseChildren = true;
-			
+			mouseChildren = true;		
 			this.visible = false;
 		}
 

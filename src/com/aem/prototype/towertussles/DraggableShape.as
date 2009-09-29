@@ -15,6 +15,9 @@ package com.aem.prototype.towertussles
 
 		private var originalLocation:Point;
 		private var startingLocation:Point;
+		public var rotateBool:Boolean;
+	    public var offset:Number;
+	    public var dispatchEventString:String;
 
 		public function DraggableShape():void
 		{
@@ -47,7 +50,7 @@ package com.aem.prototype.towertussles
 
 		public function submit(e:Event):void
 		{
-			dispatchEvent(new Event(Level.SUBMIT_BOX));
+			dispatchEvent(new Event(Level.SUBMIT_SHAPE));
 			this.x = originalLocation.x;
 			this.y = originalLocation.y;
 			this.rotation = 0;
@@ -59,6 +62,32 @@ package com.aem.prototype.towertussles
 				if(this.getChildAt(i) is Rotator)
 				   Rotator(this.getChildAt(i)).cursor = cursor;
 			}
+		}
+		
+		public function initiateRotate(e:MouseEvent):void
+		{
+			offset = getAngle(e) - this.rotation;
+			stage.addEventListener(MouseEvent.MOUSE_MOVE, rotate);
+			stage.addEventListener(MouseEvent.MOUSE_UP, stopRotate);
+		}
+
+		public function stopRotate(e:MouseEvent):void
+		{
+			stage.removeEventListener(MouseEvent.MOUSE_MOVE, rotate);
+		}
+
+		public function getAngle(e:MouseEvent):Number
+		{			
+			var p:Point = new Point(this.x, this.y);
+            p = this.parent.localToGlobal(p);
+            return Math.atan2(e.stageY - p.y, e.stageX - p.x) * 180 / Math.PI;
+		}
+
+		public function rotate(e:MouseEvent):void
+		{
+			var newTheta:Number =getAngle(e);
+			this.rotation = newTheta - offset;
+			e.updateAfterEvent();
 		}
 
 	}

@@ -13,6 +13,7 @@ package com.aem.prototype.towertussles
 	import com.aem.molecule.entities.listeners.CollisionListener;
 	
 	import flash.display.DisplayObject;
+	import flash.display.MovieClip;
 	import flash.display.Sprite;
 	import flash.events.Event;
 
@@ -20,6 +21,8 @@ package com.aem.prototype.towertussles
 	{
 		public static const GAME_OVER:String="gameOver";
 		public static const SUBMIT_BOX:String="submitBox";
+		public static const SUBMIT_THIN_RECTANGLE:String="submitThinRectangle";
+		public static const SUBMIT_SHAPE:String = "submitShape";
 		private static const ITERATIONS:uint=10;
 		private static const TIMESTEP:Number=1 / 30;
 		private static const STARTING_GRAVITY:Number=30;
@@ -30,6 +33,7 @@ package com.aem.prototype.towertussles
 		private var mCollisionListener:CollisionListener;
 		private var mGravity:b2Vec2=new b2Vec2(0, STARTING_GRAVITY);
 		private var mGame:Game;
+		private var mSpriteChildren:Array=[];
 		private var cursor:RotateCursor;
 
 		private var _world:b2World;
@@ -42,17 +46,22 @@ package com.aem.prototype.towertussles
 		public function init(game:Game):void
 		{
 			mGame=game;
-			mGame.camera.addChild(mSprite);
+			mGame.camera.add(mSprite,1);
 			var cursor:RotatableCursor = new RotatableCursor();
-			mGame.camera.addChild(cursor);
+			mGame.stage.addChild(cursor);
 			cursor.camera = mGame.camera;
 			for(var i:Number=0;i<mSprite.numChildren;i++)
 			{
 				if(mSprite.getChildAt(i) is DraggableShape)
 				  DraggableShape(mSprite.getChildAt(i)).passCursor(cursor);
 			}
-			
-			addEventListener(SUBMIT_BOX, submitBox);
+			var child:DisplayObject;
+			while(mSprite.numChildren>0)
+			{
+				child = mSprite.removeChildAt(0);
+				mSpriteChildren.push(child);
+				mGame.camera.add(child,1);
+			}		
 
 			initWorld();
 			initBodies();
@@ -78,18 +87,18 @@ package com.aem.prototype.towertussles
 
 			mCollisionListener=new CollisionListener();
 			_world.SetContactListener(mCollisionListener);
-		}
+		} 
 
 		private function initBodies():void
 		{
-			for (var i:uint=0; i < mSprite.numChildren; i++)
+			for (var i:uint=0; i < mSpriteChildren.length; i++)
 			{
-				var child:DisplayObject=mSprite.getChildAt(i);
+				var child:DisplayObject= mSpriteChildren[i];
 				if (child is PhysicalEntity)
 					PhysicalEntity(child).init(_world);
-				else if (child is DraggableBox)
+				else if (child is DraggableShape)
 				{
-					DraggableBox(child).addEventListener(SUBMIT_BOX, submitBox);
+					DraggableShape(child).addEventListener(SUBMIT_SHAPE, submitShape);
 				}
 			}
 		}
@@ -158,16 +167,20 @@ package com.aem.prototype.towertussles
 			_world=null;
 		}
 
-		public function submitBox(e:Event):void
+		public function submitShape(e:Event):void
 		{
-			var obj:Object=e.currentTarget;
-			var box:Box=new Box();
-			box.x=obj.x;
-			box.y=obj.y;
-			box.rotation = obj.rotation;
-			box.init(_world);
-			mSprite.addChild(box);
-			//_game.camera.addChild(box);
+			var obj:DraggableShape=DraggableShape(e.currentTarget);
+			var shape:MovieClip;
+			if(obj.dispatchEventString==Level.SUBMIT_BOX)
+				shape = new Box();	}
+			else if(obj.dispatchEventString == Level.SUBMIT_THIN_RECTANGLE)
+			    shape = new ThinRectangle();
+			    
+			shape.x=obj.x;
+			shape.y=obj.y;
+			shape.rotation = obj.rotation;
+			shape.init(_world);
+			mSprite.addChild(shape);
 		}
 
 		private function gameOver(e:Event):void

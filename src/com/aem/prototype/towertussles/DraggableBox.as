@@ -16,6 +16,7 @@ package com.aem.prototype.towertussles
 
 		public function DraggableBox():void
 		{
+			this.dispatchEventString = Level.SUBMIT_BOX; 
 		}
 
 	}
