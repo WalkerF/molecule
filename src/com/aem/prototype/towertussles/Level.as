@@ -5,24 +5,26 @@ package com.aem.prototype.towertussles
 	import Box2D.Collision.Shapes.*;
 	import Box2D.Common.Math.*;
 	import Box2D.Dynamics.*;
-	
+
 	import com.aem.molecule.Game;
 	import com.aem.molecule.entities.ActiveEntity;
 	import com.aem.molecule.entities.PhysicalEntity;
 	import com.aem.molecule.entities.listeners.BoundarySweeper;
 	import com.aem.molecule.entities.listeners.CollisionListener;
-	
+
 	import flash.display.DisplayObject;
-	import flash.display.MovieClip;
 	import flash.display.Sprite;
 	import flash.events.Event;
+	import flash.events.MouseEvent;
 
 	public class Level extends Sprite
 	{
 		public static const GAME_OVER:String="gameOver";
 		public static const SUBMIT_BOX:String="submitBox";
 		public static const SUBMIT_THIN_RECTANGLE:String="submitThinRectangle";
-		public static const SUBMIT_SHAPE:String = "submitShape";
+		public static const SUBMIT_SHAPE:String="submitShape";
+		public static const CREATE_THUMB_TACK:String="createThumbTack";
+		public static const CREATE_DRAGGABLE:String="createDraggable";
 		private static const ITERATIONS:uint=10;
 		private static const TIMESTEP:Number=1 / 30;
 		private static const STARTING_GRAVITY:Number=30;
@@ -34,7 +36,7 @@ package com.aem.prototype.towertussles
 		private var mGravity:b2Vec2=new b2Vec2(0, STARTING_GRAVITY);
 		private var mGame:Game;
 		private var mSpriteChildren:Array=[];
-		private var cursor:RotateCursor;
+		private var cursor:RotatableCursor;
 
 		private var _world:b2World;
 
@@ -46,22 +48,22 @@ package com.aem.prototype.towertussles
 		public function init(game:Game):void
 		{
 			mGame=game;
-			mGame.camera.add(mSprite,1);
-			var cursor:RotatableCursor = new RotatableCursor();
+			mGame.camera.add(mSprite, 1);
+			cursor=new RotatableCursor();
 			mGame.stage.addChild(cursor);
-			cursor.camera = mGame.camera;
-			for(var i:Number=0;i<mSprite.numChildren;i++)
+			cursor.camera=mGame.camera;
+			for (var i:Number=0; i < mSprite.numChildren; i++)
 			{
-				if(mSprite.getChildAt(i) is DraggableShape)
-				  DraggableShape(mSprite.getChildAt(i)).passCursor(cursor);
+				if (mSprite.getChildAt(i) is DraggableShape)
+					DraggableShape(mSprite.getChildAt(i)).passCursor(cursor);
 			}
 			var child:DisplayObject;
-			while(mSprite.numChildren>0)
+			while (mSprite.numChildren > 0)
 			{
-				child = mSprite.removeChildAt(0);
+				child=mSprite.removeChildAt(0);
 				mSpriteChildren.push(child);
-				mGame.camera.add(child,1);
-			}		
+				mGame.camera.add(child, 1);
+			}
 
 			initWorld();
 			initBodies();
@@ -87,18 +89,24 @@ package com.aem.prototype.towertussles
 
 			mCollisionListener=new CollisionListener();
 			_world.SetContactListener(mCollisionListener);
-		} 
+		}
 
 		private function initBodies():void
 		{
 			for (var i:uint=0; i < mSpriteChildren.length; i++)
 			{
-				var child:DisplayObject= mSpriteChildren[i];
-				if (child is PhysicalEntity)
-					PhysicalEntity(child).init(_world);
-				else if (child is DraggableShape)
+				var child:DisplayObject=mSpriteChildren[i];
+				if (child is DraggableShape)
 				{
 					DraggableShape(child).addEventListener(SUBMIT_SHAPE, submitShape);
+					DraggableShape(child).init(_world);
+				}
+				else if (child is PhysicalEntity)
+					PhysicalEntity(child).init(_world);
+				else if (child is Menu)
+				{
+					Menu(child).addEventListener(CREATE_THUMB_TACK, createThumbTack);
+					Menu(child).init();
 				}
 			}
 		}
@@ -123,6 +131,25 @@ package com.aem.prototype.towertussles
 			return meters * 30;
 		}
 
+		private function p2m(pixels:Number):Number
+		{
+			return pixels / 30;
+		}
+
+		public function setupDraggable(event:Event):void
+		{
+			var obj:DisplayObject=DisplayObject(event.currentTarget);
+			var box:MenuBox=new MenuBox();
+			box.x=obj.x;
+			box.y=obj.y;
+			mGame.camera.add(box, 1);
+			box.passCursor(cursor);
+			box.addEventListener(SUBMIT_SHAPE, submitShape);
+			box.init(_world);
+			mGame.camera.remove(obj, 1);
+			box.pickupItem();
+		}
+
 		public function update():void
 		{
 			_world.Step(TIMESTEP, ITERATIONS);
@@ -131,9 +158,19 @@ package com.aem.prototype.towertussles
 			{
 				if (body.GetUserData() is Sprite)
 				{
-					body.GetUserData().x=m2p(body.GetPosition().x);
-					body.GetUserData().y=m2p(body.GetPosition().y);
-					body.GetUserData().rotation=body.GetAngle() * (180 / Math.PI);
+					if (body.GetUserData() is DraggableShape && !DraggableShape(body.GetUserData()).isPlaced)
+					{
+						var vec:b2Vec2=new b2Vec2()
+						vec.x=p2m(body.GetUserData().x);
+						vec.y=p2m(body.GetUserData().y);
+						body.SetXForm(vec, body.GetUserData().rotation / 180 * Math.PI);
+					}
+					else
+					{
+						body.GetUserData().x=m2p(body.GetPosition().x);
+						body.GetUserData().y=m2p(body.GetPosition().y);
+						body.GetUserData().rotation=body.GetAngle() * (180 / Math.PI);
+					}
 				}
 				if (body.GetUserData() is ActiveEntity)
 				{
@@ -170,17 +207,14 @@ package com.aem.prototype.towertussles
 		public function submitShape(e:Event):void
 		{
 			var obj:DraggableShape=DraggableShape(e.currentTarget);
-			var shape:MovieClip;
-			if(obj.dispatchEventString==Level.SUBMIT_BOX)
-				shape = new Box();	}
-			else if(obj.dispatchEventString == Level.SUBMIT_THIN_RECTANGLE)
-			    shape = new ThinRectangle();
-			    
-			shape.x=obj.x;
-			shape.y=obj.y;
-			shape.rotation = obj.rotation;
-			shape.init(_world);
-			mSprite.addChild(shape);
+			obj.placeOnBoard(_world);
+		}
+
+		public function createThumbTack(e:Event):void
+		{
+			var tack:ThumbTack=new MenuBoxThumbTack();
+			mGame.camera.add(tack, 1);
+			tack.addEventListener(CREATE_DRAGGABLE, setupDraggable);
 		}
 
 		private function gameOver(e:Event):void
