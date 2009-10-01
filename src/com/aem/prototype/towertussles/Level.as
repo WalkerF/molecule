@@ -5,17 +5,17 @@ package com.aem.prototype.towertussles
 	import Box2D.Collision.Shapes.*;
 	import Box2D.Common.Math.*;
 	import Box2D.Dynamics.*;
-
+	
 	import com.aem.molecule.Game;
 	import com.aem.molecule.entities.ActiveEntity;
 	import com.aem.molecule.entities.PhysicalEntity;
 	import com.aem.molecule.entities.listeners.BoundarySweeper;
 	import com.aem.molecule.entities.listeners.CollisionListener;
-
+	
 	import flash.display.DisplayObject;
 	import flash.display.Sprite;
 	import flash.events.Event;
-	import flash.events.MouseEvent;
+	import flash.geom.Point;
 
 	public class Level extends Sprite
 	{
@@ -25,6 +25,7 @@ package com.aem.prototype.towertussles
 		public static const SUBMIT_SHAPE:String="submitShape";
 		public static const CREATE_THUMB_TACK:String="createThumbTack";
 		public static const CREATE_DRAGGABLE:String="createDraggable";
+		public static const CHECK_DRAGGABLE_MENU_DROP:String="checkDraggableMenuDrop";
 		private static const ITERATIONS:uint=10;
 		private static const TIMESTEP:Number=1 / 30;
 		private static const STARTING_GRAVITY:Number=30;
@@ -35,14 +36,17 @@ package com.aem.prototype.towertussles
 		private var mCollisionListener:CollisionListener;
 		private var mGravity:b2Vec2=new b2Vec2(0, STARTING_GRAVITY);
 		private var mGame:Game;
+		private var mMenu:Menu;
 		private var mSpriteChildren:Array=[];
 		private var cursor:RotatableCursor;
+		public var mHasDraggable:Boolean;
 
 		private var _world:b2World;
 
 		public function Level(sprite:TowerSprites):void
 		{
 			mSprite=sprite;
+			mHasDraggable=false;
 		}
 
 		public function init(game:Game):void
@@ -52,11 +56,6 @@ package com.aem.prototype.towertussles
 			cursor=new RotatableCursor();
 			mGame.stage.addChild(cursor);
 			cursor.camera=mGame.camera;
-			for (var i:Number=0; i < mSprite.numChildren; i++)
-			{
-				if (mSprite.getChildAt(i) is DraggableShape)
-					DraggableShape(mSprite.getChildAt(i)).passCursor(cursor);
-			}
 			var child:DisplayObject;
 			while (mSprite.numChildren > 0)
 			{
@@ -96,17 +95,12 @@ package com.aem.prototype.towertussles
 			for (var i:uint=0; i < mSpriteChildren.length; i++)
 			{
 				var child:DisplayObject=mSpriteChildren[i];
-				if (child is DraggableShape)
-				{
-					DraggableShape(child).addEventListener(SUBMIT_SHAPE, submitShape);
-					DraggableShape(child).init(_world);
-				}
-				else if (child is PhysicalEntity)
+				if (child is PhysicalEntity)
 					PhysicalEntity(child).init(_world);
 				else if (child is Menu)
 				{
-					Menu(child).addEventListener(CREATE_THUMB_TACK, createThumbTack);
-					Menu(child).init();
+					mMenu=Menu(child);
+					mMenu.addEventListener(CREATE_THUMB_TACK, createThumbTack);
 				}
 			}
 		}
@@ -136,20 +130,6 @@ package com.aem.prototype.towertussles
 			return pixels / 30;
 		}
 
-		public function setupDraggable(event:Event):void
-		{
-			var obj:DisplayObject=DisplayObject(event.currentTarget);
-			var box:MenuBox=new MenuBox();
-			box.x=obj.x;
-			box.y=obj.y;
-			mGame.camera.add(box, 1);
-			box.passCursor(cursor);
-			box.addEventListener(SUBMIT_SHAPE, submitShape);
-			box.init(_world);
-			mGame.camera.remove(obj, 1);
-			box.pickupItem();
-		}
-
 		public function update():void
 		{
 			_world.Step(TIMESTEP, ITERATIONS);
@@ -177,6 +157,8 @@ package com.aem.prototype.towertussles
 					ActiveEntity(body.GetUserData()).update(mGame);
 				}
 			}
+
+			mMenu.update();
 
 			for each (var outOfBoundsBody:b2Body in mBoundarySweeper.bodies)
 			{
@@ -208,13 +190,71 @@ package com.aem.prototype.towertussles
 		{
 			var obj:DraggableShape=DraggableShape(e.currentTarget);
 			obj.placeOnBoard(_world);
+			mHasDraggable=false;
+		}
+
+		public function checkMenuDrop(e:Event):void
+		{
+			var shape:DraggableShape=DraggableShape(e.currentTarget);
+			if (shape.y> mMenu.y - mMenu.height / 2)
+				if (shape.y < mMenu.y + mMenu.height / 2)
+					if (shape.x > mMenu.x - mMenu.width / 2)
+						if (shape.x < mMenu.x + mMenu.width / 2)
+						{
+							draggableToTack(shape);
+						}
+
+		}
+
+		public function draggableToTack(shape:DraggableShape):void
+		{
+			mGame.camera.remove(shape, 1);
+			shape.removeEventListener(SUBMIT_SHAPE, submitShape);
+			shape.removeEventListener(CHECK_DRAGGABLE_MENU_DROP, checkMenuDrop);
+			shape.destroyBody(_world);
+			shape.rotation = 0;
+			mHasDraggable=false;
+			var l_tack:ThumbTack;
+			if (shape is Box)
+				l_tack=new BoxThumbTack();
+			else if (shape is ThinRectangle)
+				l_tack=new ThinRectangleThumbTack();
+			l_tack.m_DraggableShape=shape;
+			mMenu.addThumbTack(l_tack);
 		}
 
 		public function createThumbTack(e:Event):void
 		{
-			var tack:ThumbTack=new MenuBoxThumbTack();
+			var tack:ThumbTack=Menu(e.currentTarget).m_current;
 			mGame.camera.add(tack, 1);
-			tack.addEventListener(CREATE_DRAGGABLE, setupDraggable);
+			tack.addEventListener(CREATE_DRAGGABLE, createDraggable);
+		}
+
+		public function createDraggable(event:Event):void
+		{
+			if (!mHasDraggable)
+			{
+				var tack:ThumbTack=ThumbTack(event.currentTarget);
+				tackToDraggable(tack);
+			}
+		}
+
+		public function tackToDraggable(tack:ThumbTack):void
+		{
+			var shape:DraggableShape=tack.m_DraggableShape;
+			mGame.camera.add(shape, 1);
+			/*var p:Point = new Point(stage.mouseX,stage.mouseY);
+			p = shape.globalToLocal(p);
+			shape.x=p.x;
+			shape.y=p.y;*/
+			shape.passCursor(cursor);
+			shape.addEventListener(SUBMIT_SHAPE, submitShape);
+			shape.addEventListener(CHECK_DRAGGABLE_MENU_DROP, checkMenuDrop);
+			shape.init(_world);
+			mGame.camera.remove(tack, 1);
+			mMenu.removeThumbTack(tack);
+			shape.pickupItem();
+			mHasDraggable=true;
 		}
 
 		private function gameOver(e:Event):void

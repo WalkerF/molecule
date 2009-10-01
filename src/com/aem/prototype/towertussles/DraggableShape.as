@@ -4,9 +4,9 @@ package com.aem.prototype.towertussles
 	import Box2D.Collision.Shapes.*;
 	import Box2D.Common.Math.*;
 	import Box2D.Dynamics.*;
-
+	
 	import com.aem.molecule.entities.PhysicalEntity;
-
+	
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.geom.Point;
@@ -52,6 +52,7 @@ package com.aem.prototype.towertussles
 		public function place(event:MouseEvent):void
 		{
 			this.stopDrag();
+			dispatchEvent(new Event(Level.CHECK_DRAGGABLE_MENU_DROP));
 		}
 
 
@@ -79,6 +80,7 @@ package com.aem.prototype.towertussles
 		public function stopRotate(e:MouseEvent):void
 		{
 			stage.removeEventListener(MouseEvent.MOUSE_MOVE, rotate);
+            stage.removeEventListener(MouseEvent.MOUSE_UP, stopRotate);
 		}
 
 		public function getAngle(e:MouseEvent):Number
@@ -109,12 +111,23 @@ package com.aem.prototype.towertussles
 			this.myBody=body;
 			return body;
 		}
+		
+		public function destroyBody(world:b2World):void
+		{
+			world.DestroyBody(this.myBody);
+		}
 
 		public function placeOnBoard(world:b2World):void
 		{
+			var child:Rotator;
 			while (this.numChildren > 1)
-				this.removeChildAt(1); //relies on fact that sensors come after initial shape           
-			world.DestroyBody(this.myBody);
+			{
+				child = Rotator(this.getChildAt(1)); //relies on fact that sensors come after initial shape    
+				child.removeEventListener(MouseEvent.MOUSE_DOWN, initiateRotate);
+				child.removeEventListener(MouseEvent.MOUSE_OVER, child.removeParentListener);
+				this.removeChildAt(1);         
+			}
+			destroyBody(world);
 
 			var bodyDef:b2BodyDef=createBodyDef();
 
