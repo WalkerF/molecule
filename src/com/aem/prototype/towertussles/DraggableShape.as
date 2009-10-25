@@ -4,12 +4,17 @@ package com.aem.prototype.towertussles
 	import Box2D.Collision.Shapes.*;
 	import Box2D.Common.Math.*;
 	import Box2D.Dynamics.*;
-	
+
 	import com.aem.molecule.entities.PhysicalEntity;
-	
+	import com.aem.molecule.entities.listeners.CollisionListener;
+
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.geom.Point;
+	
+	import WCK.wck.*;
+
+import Box2D.Dynamics.Joints.*;
 
 	public class DraggableShape extends PhysicalEntity
 	{
@@ -21,9 +26,12 @@ package com.aem.prototype.towertussles
 		public var dispatchEventString:String;
 		private var myBody:b2Body;
 		public var isPlaced:Boolean;
+		public var overlapping:Number;
 
 		public function DraggableShape():void
 		{
+			this.overlapping = 0;
+			this.gotoAndStop("valid");
 			this.isPlaced=false;
 			this.buttonMode=true;
 			originalLocation=new Point();
@@ -58,7 +66,10 @@ package com.aem.prototype.towertussles
 
 		public function submit(e:Event):void
 		{
-			dispatchEvent(new Event(Level.SUBMIT_SHAPE));
+			if (this.overlapping <= 0)
+			{
+				dispatchEvent(new Event(Level.SUBMIT_SHAPE));
+			}
 		}
 
 		public function passCursor(cursor:RotatableCursor):void
@@ -80,7 +91,7 @@ package com.aem.prototype.towertussles
 		public function stopRotate(e:MouseEvent):void
 		{
 			stage.removeEventListener(MouseEvent.MOUSE_MOVE, rotate);
-            stage.removeEventListener(MouseEvent.MOUSE_UP, stopRotate);
+			stage.removeEventListener(MouseEvent.MOUSE_UP, stopRotate);
 		}
 
 		public function getAngle(e:MouseEvent):Number
@@ -103,15 +114,27 @@ package com.aem.prototype.towertussles
 
 			var boxDef:b2PolygonDef=createShapeDef();
 			boxDef.isSensor=true;
+			boxDef.userData="draggable_shape" + name;
 
 			var body:b2Body=world.CreateBody(bodyDef);
 			body.CreateShape(boxDef);
 			body.SetMassFromShapes();
 
+			CollisionListener(world.m_contactListener).registerPersist("draggable_shape" + name, onPersist);
+
 			this.myBody=body;
 			return body;
 		}
-		
+
+		private function onPersist(point:b2ContactPoint):void
+		{
+			if (point.shape1.GetUserData() == "draggable_shape" + name || point.shape2.GetUserData() == "draggable_shape" + name)
+			{
+				this.overlapping=5;
+				this.gotoAndStop("invalid");
+			}
+		}
+
 		public function destroyBody(world:b2World):void
 		{
 			world.DestroyBody(this.myBody);
@@ -122,10 +145,10 @@ package com.aem.prototype.towertussles
 			var child:Rotator;
 			while (this.numChildren > 1)
 			{
-				child = Rotator(this.getChildAt(1)); //relies on fact that sensors come after initial shape    
+				child=Rotator(this.getChildAt(1)); //relies on fact that sensors come after initial shape    
 				child.removeEventListener(MouseEvent.MOUSE_DOWN, initiateRotate);
 				child.removeEventListener(MouseEvent.MOUSE_OVER, child.removeParentListener);
-				this.removeChildAt(1);         
+				this.removeChildAt(1);
 			}
 			destroyBody(world);
 
@@ -142,6 +165,7 @@ package com.aem.prototype.towertussles
 			body.SetMassFromShapes();
 
 			this.removeAllEventListeners();
+			CollisionListener(world.m_contactListener).deletePersist("draggable_shape" + name, onPersist);
 			this.buttonMode=false;
 			this.isPlaced=true;
 		}

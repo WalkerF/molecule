@@ -15,7 +15,6 @@ package com.aem.prototype.towertussles
 	import flash.display.DisplayObject;
 	import flash.display.Sprite;
 	import flash.events.Event;
-	import flash.geom.Point;
 
 	public class Level extends Sprite
 	{
@@ -144,6 +143,12 @@ package com.aem.prototype.towertussles
 						vec.x=p2m(body.GetUserData().x);
 						vec.y=p2m(body.GetUserData().y);
 						body.SetXForm(vec, body.GetUserData().rotation / 180 * Math.PI);
+						if(DraggableShape(body.GetUserData()).overlapping>0)
+						{
+						  DraggableShape(body.GetUserData()).overlapping--;
+						  if(DraggableShape(body.GetUserData()).overlapping==0)
+						     DraggableShape(body.GetUserData()).gotoAndStop("valid");
+						}
 					}
 					else
 					{
@@ -243,10 +248,8 @@ package com.aem.prototype.towertussles
 		{
 			var shape:DraggableShape=tack.m_DraggableShape;
 			mGame.camera.add(shape, 1);
-			/*var p:Point = new Point(stage.mouseX,stage.mouseY);
-			p = shape.globalToLocal(p);
-			shape.x=p.x;
-			shape.y=p.y;*/
+			shape.x=shape.parent.mouseX;
+			shape.y=shape.parent.mouseY;
 			shape.passCursor(cursor);
 			shape.addEventListener(SUBMIT_SHAPE, submitShape);
 			shape.addEventListener(CHECK_DRAGGABLE_MENU_DROP, checkMenuDrop);

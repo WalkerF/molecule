@@ -16,10 +16,6 @@ package com.aem.prototype.towertussles
 		
 		public function createDraggable(e:MouseEvent):void
 		{
-			//var p:Point = new Point(e.stageX,e.stageY);
-			//p = m_DraggableShape.globalToLocal(p);
-			m_DraggableShape.x = this.x;
-			m_DraggableShape.y = this.y;
 			dispatchEvent(new Event(Level.CREATE_DRAGGABLE));
 		}
 

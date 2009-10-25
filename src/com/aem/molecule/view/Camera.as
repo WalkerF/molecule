@@ -82,18 +82,21 @@ package com.aem.molecule.view
 
         public function update():void
         {
-            if (!_targets.length)
-                return; // nothing to update
+            //if (!_targets.length)
+              //  return; // nothing to update
 
             var center:Point = new Point();
             for each (var sprite:DisplayObject in _targets)
             {
                 center.x += sprite.x;
                 center.y += sprite.y;
-            }
+			}
 
-            center.x /= _targets.length;
-            center.y /= _targets.length;
+			if (_targets.length > 0)
+			{
+				center.x/=_targets.length;
+				center.y/=_targets.length;
+			}
 
             _layers[STAGE].x = (stage.stageWidth / 2) - center.x;
             _layers[STAGE].y = ((stage.stageHeight / 2) + 50) - center.y;
